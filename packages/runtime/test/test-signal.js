@@ -1,5 +1,5 @@
 // Signal 运行时测试
-import { __signal, __derived, __effect, __flush } from '../src/signal.js';
+import { __signal, __derived, __effect, __flush, __store, __async } from '../src/signal.js';
 
 let passed = 0, failed = 0;
 
@@ -93,6 +93,39 @@ test('Effect: dispose 停止追踪', () => {
   s.value = 99;
   __flush();
   assert(count === 1, 'dispose 后不应再执行');
+});
+
+// Store
+test('Store: 读写属性', () => {
+  const store = __store({ count: 0, name: 'aether' });
+  assert(store.count === 0, '初始 count 应为 0');
+  assert(store.name === 'aether', '初始 name 应为 aether');
+  store.count = 42;
+  assert(store.count === 42, '设置后 count 应为 42');
+  store.name = 'test';
+  assert(store.name === 'test', '设置后 name 应为 test');
+});
+
+test('Store: 响应式追踪', () => {
+  const store = __store({ x: 1 });
+  let log = [];
+  __effect(() => { log.push(store.x); });
+  assert(log.length === 1 && log[0] === 1, 'effect 应立即执行');
+  store.x = 99;
+  __flush();
+  assert(log.length === 2 && log[1] === 99, 'store 属性变化应触发 effect');
+});
+
+test('Store: 细粒度更新', () => {
+  const store = __store({ a: 1, b: 2 });
+  let aCount = 0, bCount = 0;
+  __effect(() => { store.a; aCount++; });
+  __effect(() => { store.b; bCount++; });
+  assert(aCount === 1 && bCount === 1, '初始各执行一次');
+  store.a = 10;
+  __flush();
+  assert(aCount === 2, 'a 变化应触发 a 的 effect');
+  assert(bCount === 1, 'a 变化不应触发 b 的 effect');
 });
 
 console.log(`\n=============================`);

@@ -1,9 +1,13 @@
 // Aether Compiler - Babel Plugin
-// 将 $state/$derived/$effect 宏转换为运行时调用
+// 将 $state/$derived/$effect/$store/$async/$style 宏转换为运行时调用
 // 将 JSX 转换为细粒度 DOM 操作
 
 import { transformMacros } from './transform-macros.js';
 import { transformJSX } from './transform-jsx.js';
+import { transformStyle } from './transform-style.js';
+
+// 所有 Aether 宏名称
+const MACRO_NAMES = ['$state', '$derived', '$effect', '$store', '$async', '$style'];
 
 export default function aetherPlugin({ types: t }) {
   return {
@@ -40,7 +44,7 @@ export default function aetherPlugin({ types: t }) {
           const imported = spec.imported.name;
           const local = spec.local.name;
 
-          if (imported === '$state' || imported === '$derived' || imported === '$effect') {
+          if (MACRO_NAMES.includes(imported)) {
             // 标记这些导入，后续处理
             state.aether[`_import_${imported}`] = local;
           }
@@ -76,6 +80,12 @@ export default function aetherPlugin({ types: t }) {
         transformMacros.identifier(path, state, t);
       },
 
+      // $style 标签模板转换
+      TaggedTemplateExpression(path, state) {
+        if (!state.aether.macroImported) return;
+        transformStyle.taggedTemplate(path, state, t);
+      },
+
       // JSX 转换
       JSXElement(path, state) {
         if (!state.aether.macroImported) return;
@@ -101,6 +111,8 @@ function rewriteImports(programPath, state, t) {
   if (stateVars.size > 0) runtimeImports.add('__signal');
   if (derivedVars.size > 0) runtimeImports.add('__derived');
   if (state.aether.effectCalls.length > 0) runtimeImports.add('__effect');
+  if (state.aether._hasStore) runtimeImports.add('__store');
+  if (state.aether._hasAsync) runtimeImports.add('__async');
 
   // 检查是否有 JSX（需要 DOM 运行时）
   if (state.aether._needsDOM) {
@@ -116,7 +128,7 @@ function rewriteImports(programPath, state, t) {
   for (const spec of importPath.node.specifiers) {
     if (!t.isImportSpecifier(spec)) continue;
     const name = spec.imported.name;
-    if (name !== '$state' && name !== '$derived' && name !== '$effect') {
+    if (!MACRO_NAMES.includes(name)) {
       keptSpecifiers.push(spec);
     }
   }

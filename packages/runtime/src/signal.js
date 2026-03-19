@@ -217,3 +217,89 @@ export function __batch(fn) {
     }
   }
 }
+
+// ============================================
+// Store - 跨组件全局状态（编译时转为信号操作）
+// ============================================
+// $store({ count: 0, name: 'aether' }) 编译为 __store(...)
+// 每个属性变为独立 Signal，读写自动追踪
+
+export function __store(initialState) {
+  const signals = {};
+  const proxy = new Proxy({}, {
+    get(_, key) {
+      if (key === '__signals') return signals;
+      if (!signals[key]) return undefined;
+      return signals[key].value;
+    },
+    set(_, key, value) {
+      if (!signals[key]) {
+        signals[key] = new Signal(value);
+      } else {
+        signals[key].value = value;
+      }
+      return true;
+    },
+    has(_, key) {
+      return key in signals;
+    },
+    ownKeys() {
+      return Object.keys(signals);
+    },
+    getOwnPropertyDescriptor(_, key) {
+      if (key in signals) {
+        return { configurable: true, enumerable: true, writable: true };
+      }
+    }
+  });
+
+  // 初始化所有属性为信号
+  for (const [key, value] of Object.entries(initialState)) {
+    signals[key] = new Signal(value);
+  }
+
+  return proxy;
+}
+
+// ============================================
+// Async - 异步数据获取（编译时转为信号操作）
+// ============================================
+// let data = $async(() => fetch('/api')) 编译为 __async(...)
+// 返回 { value, loading, error } 三个信号
+
+export function __async(fetcher) {
+  const data = new Signal(undefined);
+  const loading = new Signal(true);
+  const error = new Signal(null);
+
+  const resource = {
+    get value() { return data.value; },
+    get loading() { return loading.value; },
+    get error() { return error.value; },
+    refetch
+  };
+
+  async function refetch() {
+    loading._value = true;
+    // 直接设置避免多次通知，用 batch
+    error._value = null;
+    // 通知 loading 变化
+    for (const sub of loading._subscribers) {
+      __scheduleUpdate(sub);
+    }
+
+    try {
+      const result = await fetcher();
+      data.value = result;
+      loading.value = false;
+    } catch (e) {
+      error.value = e;
+      loading.value = false;
+    }
+  }
+
+  // 立即执行
+  refetch();
+
+  return resource;
+}

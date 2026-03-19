@@ -4,11 +4,15 @@
 
 export {
   Signal, __signal, __effect, __derived, __flush, __batch,
-  __pushEffect, __popEffect
+  __pushEffect, __popEffect, __store, __async
 } from './signal.js';
 
 export {
   mount, __createElement, __createText, __setAttr,
   __bindText, __bindAttr, __conditional, __list,
-  __createComponent, ComponentContext
+  __createComponent, __spreadAttrs, ComponentContext
 } from './dom.js';
+
+export { navigate, Link, __router, __routePath, __routeParams, __routeQuery } from './router.js';
+
+export { __injectStyle, __removeStyle, __scopeId } from './style.js';

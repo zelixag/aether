@@ -19,5 +19,6 @@
   "scripts": {
     "build": "echo 'runtime is plain JS, no build needed'"
   },
-  "files": ["src"]
+  "types": "types/aether.d.ts",
+  "files": ["src", "types"]
 }

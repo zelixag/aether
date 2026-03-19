@@ -64,15 +64,40 @@ export function __createText(value) {
   return document.createTextNode(value);
 }
 
+// 危险属性名黑名单——防止原型链污染
+const UNSAFE_ATTRS = new Set([
+  '__proto__', 'constructor', 'prototype',
+  'toString', 'valueOf', 'hasOwnProperty',
+  'isPrototypeOf', 'propertyIsEnumerable',
+  'toLocaleString'
+]);
+
+// 安全的属性展开——只遍历自有属性，过滤危险键
+export function __spreadAttrs(el, attrs) {
+  if (!attrs || typeof attrs !== 'object') return;
+  const keys = Object.keys(attrs); // 仅自有可枚举属性
+  for (const key of keys) {
+    if (UNSAFE_ATTRS.has(key)) continue;
+    __setAttr(el, key, attrs[key]);
+  }
+}
+
 // 设置静态属性
 export function __setAttr(el, name, value) {
+  // 安全检查：拒绝危险属性名
+  if (UNSAFE_ATTRS.has(name)) return;
+
   if (name === 'className' || name === 'class') {
     el.className = value;
   } else if (name.startsWith('on')) {
     const event = name.slice(2).toLowerCase();
     el.addEventListener(event, value);
   } else if (name === 'style' && typeof value === 'object') {
-    Object.assign(el.style, value);
+    // 安全：只复制自有属性
+    const keys = Object.keys(value);
+    for (const k of keys) {
+      if (!UNSAFE_ATTRS.has(k)) el.style[k] = value[k];
+    }
   } else {
     el.setAttribute(name, value);
   }

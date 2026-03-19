@@ -1,10 +1,12 @@
 // Aether Compiler - 宏转换
-// 处理 $state/$derived/$effect 的识别和代码转换
+// 处理 $state/$derived/$effect/$store/$async 的识别和代码转换
 
 export const transformMacros = {
   // ============================================
-  // let count = $state(0)  →  const count = __signal(0)
-  // let double = $derived(() => count.value * 2)  →  const double = __derived(() => count.value * 2)
+  // let count = $state(0)       →  const count = __signal(0)
+  // let double = $derived(fn)   →  const double = __derived(fn)
+  // let store = $store({...})   →  const store = __store({...})
+  // let data = $async(fetcher)  →  const data = __async(fetcher)
   // ============================================
   variableDeclaration(path, state, t) {
     const declarations = path.node.declarations;
@@ -19,11 +21,7 @@ export const transformMacros = {
       if (calleeName === state.aether._import_$state) {
         const varName = decl.id.name;
         state.aether.stateVars.set(varName, path);
-
-        // 替换 $state(0) → __signal(0)
         decl.init.callee = t.identifier('__signal');
-
-        // let → const（信号引用不应被重新赋值）
         path.node.kind = 'const';
       }
 
@@ -31,10 +29,23 @@ export const transformMacros = {
       if (calleeName === state.aether._import_$derived) {
         const varName = decl.id.name;
         state.aether.derivedVars.set(varName, path);
-
-        // 替换 $derived(fn) → __derived(fn)
         decl.init.callee = t.identifier('__derived');
+        path.node.kind = 'const';
+      }
 
+      // $store({ count: 0, name: 'aether' })
+      // store 不需要 .value 转换——Proxy 自动处理读写
+      if (calleeName === state.aether._import_$store) {
+        state.aether._hasStore = true;
+        decl.init.callee = t.identifier('__store');
+        path.node.kind = 'const';
+      }
+
+      // $async(() => fetch('/api'))
+      // async 返回 { value, loading, error } — 通过属性访问，不需要 .value 转换
+      if (calleeName === state.aether._import_$async) {
+        state.aether._hasAsync = true;
+        decl.init.callee = t.identifier('__async');
         path.node.kind = 'const';
       }
     }
