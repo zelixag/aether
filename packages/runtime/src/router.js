@@ -1,7 +1,7 @@
 // Aether Router - 内置路由系统
 // 基于信号的声明式路由，编译时优化
 
-import { Signal, __effect, __scheduleUpdate } from './signal.js';
+import { Signal, __effect } from './signal.js';
 import { __createElement, __createText, __setAttr, __bindText } from './dom.js';
 
 // ============================================
