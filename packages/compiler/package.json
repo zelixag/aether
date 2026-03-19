@@ -3,11 +3,10 @@
   "version": "0.1.0",
   "description": "Aether compiler - Babel plugin for macro transformation",
   "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.d.ts",
+  "main": "dist/index.js",
   "exports": {
     ".": {
-      "import": "./src/index.ts"
+      "import": "./dist/index.js"
     }
   },
   "scripts": {

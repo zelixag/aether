@@ -3,20 +3,20 @@
   "version": "0.1.0",
   "description": "Aether - compile-time reactive framework",
   "type": "module",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "exports": {
     ".": {
-      "import": "./src/index.ts"
+      "import": "./dist/index.js"
     },
     "./runtime": {
-      "import": "./src/internal.ts"
+      "import": "./dist/internal.js"
     },
     "./dom": {
-      "import": "./src/dom.ts"
+      "import": "./dist/dom.js"
     },
     "./ssr": {
-      "import": "./src/ssr.ts"
+      "import": "./dist/ssr.js"
     }
   },
   "scripts": {

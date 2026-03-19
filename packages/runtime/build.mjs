@@ -7,7 +7,7 @@ async function buildAll() {
   const ctx1 = await esbuild.context({
     entryPoints: ['src/index.ts'],
     bundle: true,
-    outfile: 'dist/aether.js',
+    outfile: 'dist/index.js',
     format: 'esm',
     platform: 'browser',
     target: 'ES2020',
@@ -45,7 +45,7 @@ async function watchAll() {
   const ctx1 = await esbuild.context({
     entryPoints: ['src/index.ts'],
     bundle: true,
-    outfile: 'dist/aether.js',
+    outfile: 'dist/index.js',
     format: 'esm',
     platform: 'browser',
     target: 'ES2020',
