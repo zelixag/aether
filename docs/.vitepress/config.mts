@@ -4,9 +4,10 @@ export default defineConfig({
   title: 'Aether',
   description: 'Compile-time Reactive Framework - 100% TypeScript, No vDOM, No Hooks Rules',
   lang: 'en-US',
+  base: '/aether/',
 
   head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    ['link', { rel: 'icon', href: '/aether/favicon.ico' }],
     ['meta', { name: 'theme-color', content: '#c45d35' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'Aether Framework' }],
