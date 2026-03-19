@@ -34,14 +34,41 @@ export function $effect(fn) {
   fn();
 }
 
+export function $store(initialState) {
+  if (typeof window !== 'undefined') {
+    console.warn(
+      '[Aether] $store() was called at runtime. ' +
+      'Make sure the Aether compiler plugin is configured.'
+    );
+  }
+  return initialState;
+}
+
+export function $async(fetcher) {
+  if (typeof window !== 'undefined') {
+    console.warn(
+      '[Aether] $async() was called at runtime. ' +
+      'Make sure the Aether compiler plugin is configured.'
+    );
+  }
+  return { value: undefined, loading: true, error: null, refetch: fetcher };
+}
+
 // 运行时内部 API（编译器输出会用到）
 export {
   Signal, __signal, __effect, __derived,
-  __flush, __pushEffect, __popEffect, __batch
+  __flush, __pushEffect, __popEffect, __batch,
+  __store, __async
 } from './signal.js';
 
 export {
   mount, __createElement, __createText, __setAttr,
   __bindText, __bindAttr, __conditional, __list,
-  __createComponent, ComponentContext
+  __createComponent, __spreadAttrs, ComponentContext
 } from './dom.js';
+
+// 内置路由
+export { navigate, Link, __router, __routePath, __routeParams, __routeQuery } from './router.js';
+
+// 内置样式
+export { __injectStyle, __removeStyle, __scopeId } from './style.js';

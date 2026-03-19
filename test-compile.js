@@ -3,14 +3,20 @@ import { transformAsync } from '@babel/core';
 import aetherPlugin from './packages/compiler/src/index.js';
 
 const input = `
-import { $state, $derived, $effect, mount } from 'aether'
+import { $state, $derived, $effect, $store, $async, mount } from 'aether'
+
+// $store: 跨组件共享状态
+const appStore = $store({ theme: 'dark', user: 'Aether' })
 
 function Counter() {
   let count = $state(0)
   let double = $derived(() => count * 2)
 
+  // $async: 异步数据获取
+  let users = $async(() => fetch('/api/users').then(r => r.json()))
+
   $effect(() => {
-    console.log(\`count is \${count}\`)
+    console.log(\`count is \${count}, theme is \${appStore.theme}\`)
   })
 
   function increment() {
@@ -23,6 +29,7 @@ function Counter() {
     <div class="counter">
       <h1>Hello</h1>
       <p>{count}</p>
+      <p>{double}</p>
       <button onClick={increment}>+1</button>
     </div>
   )
@@ -52,6 +59,8 @@ async function test() {
     ['__signal(0)', '$state → __signal'],
     ['__derived', '$derived → __derived'],
     ['__effect', '$effect → __effect'],
+    ['__store', '$store → __store'],
+    ['__async', '$async → __async'],
     ['count.value', '变量读写 → .value'],
     ['__createElement', 'JSX → __createElement'],
     ['__bindText', '动态文本 → __bindText'],
