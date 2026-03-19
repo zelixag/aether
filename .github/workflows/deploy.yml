@@ -34,7 +34,7 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install dependencies
+      - name: Install all dependencies
         run: pnpm install
 
       - name: Build compiler package
@@ -49,8 +49,7 @@ jobs:
       - name: Build counter example
         run: |
           cd examples/counter
-          rm -rf node_modules
-          pnpm install --no-frozen-lockfile
+          pnpm install
           pnpm run build
 
       - name: Copy counter example to docs/.vitepress/public/examples

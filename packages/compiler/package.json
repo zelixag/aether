@@ -1,5 +1,5 @@
 {
-  "name": "aether-compiler",
+  "name": "@zhenglinxiong/aether-compiler",
   "version": "0.1.0",
   "description": "Aether compiler - Babel plugin for macro transformation",
   "type": "module",
@@ -9,9 +9,15 @@
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "node build.mjs",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "esbuild": "^0.27.4"
   },
   "peerDependencies": {
     "@babel/core": "^7.29.0",
@@ -22,7 +28,6 @@
     "@babel/core": "^7.29.0",
     "@babel/types": "^7.29.0",
     "@babel/traverse": "^7.29.0",
-    "@types/node": "^22.0.0",
-    "esbuild": "^0.27.4"
+    "@types/node": "^22.0.0"
   }
 }

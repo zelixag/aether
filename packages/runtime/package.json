@@ -1,5 +1,5 @@
 {
-  "name": "aether",
+  "name": "@zhenglinxiong/aether",
   "version": "0.1.0",
   "description": "Aether - compile-time reactive framework",
   "type": "module",
@@ -27,6 +27,7 @@
   },
   "types": "types/aether.d.ts",
   "files": [
+    "dist",
     "src",
     "types"
   ],
