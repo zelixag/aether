@@ -137,7 +137,7 @@ npm install vite
 npx vite
 ```
 
-访问 http://localhost:5173，你应该能看到一个功能完整的计数器。
+访问 http://localhost:5173（Vite 默认端口），你应该能看到一个功能完整的计数器。
 
 ## 编译后代码
 

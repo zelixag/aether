@@ -247,7 +247,7 @@ v0.2.0 (Q2)                    v0.3.0 (Q3)                    v1.0.0 (Q4)
 
 ### 7.2 参考资料
 
-- [Aether README 愿景文档](../../README.md)
+- [Aether README 愿景文档](https://github.com/zelixag/aether#readme)
 - [SolidJS 响应式设计](https://www.solidjs.com/docs/latest/api)
 - [Svelte 编译时优化](https://svelte.dev/docs/svelte/compiler)
 - [Vue Vapor Mode](https://blog.vuejs.org/posts/vue-3-6)

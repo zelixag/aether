@@ -69,7 +69,7 @@ npm install
 npm run dev
 ```
 
-访问 http://localhost:5173 查看运行效果。
+运行 `npm run example:counter` 启动开发服务器查看效果。
 
 ## 功能分解
 

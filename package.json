@@ -21,13 +21,20 @@
     "test:compiler": "cd packages/compiler && node test/test-transform.js && node test/test-jsx.js",
     "test": "npm run test:runtime && npm run test:compiler",
     "test:all": "npm run test:runtime && npm run test:runtime:advanced && npm run test:runtime:security && npm run test:compiler && npm run test:compiler:advanced",
-    "example:counter": "cd examples/counter && npm run dev"
+    "example:counter": "cd examples/counter && npm run dev",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "build:example": "cd examples/counter && npm run build",
+    "deploy": "npm run docs:build && npm run build:example"
   },
   "dependencies": {
     "browserslist": "^4.28.1",
     "caniuse-lite": "^1.0.30001780"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.28.5"
+    "@babel/preset-typescript": "^7.28.5",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "vitepress": "^1.6.4"
   }
 }

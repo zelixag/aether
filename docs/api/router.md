@@ -364,7 +364,6 @@ export function navigate(to, { replace = false } = {}) {
 
 ## 相关 API
 
-- [navigate](./navigate.md) - 编程式导航
 - [$state](./$state.md) - 响应式状态
 - [$effect](./$effect.md) - 副作用
 - [$store](./$store.md) - 全局状态
