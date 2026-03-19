@@ -37,11 +37,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build compiler package
+        run: pnpm run build:compiler
+
+      - name: Build runtime package
+        run: pnpm run build:runtime
+
       - name: Build documentation
         run: pnpm run docs:build
 
       - name: Build counter example
-        run: cd examples/counter && pnpm install && pnpm run build
+        run: |
+          cd examples/counter
+          rm -rf node_modules
+          pnpm install --no-frozen-lockfile
+          pnpm run build
 
       - name: Copy counter example to docs/.vitepress/public/examples
         run: |
