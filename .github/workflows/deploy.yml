@@ -37,6 +37,12 @@ jobs:
       - name: Install all dependencies
         run: pnpm install
 
+      - name: Clean old build artifacts
+        run: |
+          rm -rf packages/compiler/dist
+          rm -rf packages/runtime/dist
+          rm -rf examples/counter/node_modules
+
       - name: Build compiler package
         run: pnpm run build:compiler
 
@@ -49,7 +55,7 @@ jobs:
       - name: Build counter example
         run: |
           cd examples/counter
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm run build
 
       - name: Copy counter example to docs/.vitepress/public/examples
