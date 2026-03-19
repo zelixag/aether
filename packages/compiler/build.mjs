@@ -8,14 +8,15 @@ async function buildAll() {
   const result = await esbuild.build({
     entryPoints: [join(__dirname, 'src/index.ts')],
     bundle: true,
-    outfile: join(__dirname, 'dist/index.cjs'),
-    format: 'cjs',
+    outfile: join(__dirname, 'dist/index.js'),
+    format: 'esm',
     platform: 'node',
     target: 'ES2020',
     sourcemap: true,
     sourcesContent: true,
-    // Externalize everything - let Node.js resolve @babel packages
-    external: ['@babel/core', '@babel/types', '@babel/traverse', '@babel/plugin-syntax-jsx', 'esbuild'],
+    // Externalize @babel packages and Node builtins
+    // Prevents bundling CJS modules that use require('fs')
+    packages: 'external',
   });
 
   if (result.errors.length > 0) {

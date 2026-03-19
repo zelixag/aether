@@ -500,7 +500,8 @@ export function aetherVitePlugin(options: { ssr?: boolean } = {}) {
 
     config() {
       return {
-        esbuild: {
+        // Vite 8+: use oxc instead of deprecated esbuild option
+        oxc: {
           jsx: 'preserve', // 保留 JSX 给 Babel 处理
         },
       };
