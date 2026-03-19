@@ -58,10 +58,10 @@ jobs:
           pnpm install --no-frozen-lockfile
           pnpm run build
 
-      - name: Copy counter example to docs/.vitepress/public/examples
+      - name: Copy counter example to docs output
         run: |
-          mkdir -p docs/.vitepress/public/examples
-          cp -r examples/counter/dist/* docs/.vitepress/public/examples/
+          mkdir -p docs/.vitepress/dist/examples
+          cp -r examples/counter/dist/* docs/.vitepress/dist/examples/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
