@@ -7,8 +7,8 @@
     "build": "vite build"
   },
   "dependencies": {
-    "aether": "file:../../packages/runtime",
-    "aether-compiler": "file:../../packages/compiler"
+    "aether": "workspace:*",
+    "aether-compiler": "workspace:*"
   },
   "devDependencies": {
     "vite": "^8.0.0",
