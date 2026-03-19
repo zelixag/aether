@@ -1,0 +1,41 @@
+{
+  "name": "create-aether-app",
+  "version": "0.2.0",
+  "description": "Aether CLI scaffolding tool - create new Aether projects with zero configuration",
+  "type": "module",
+  "bin": {
+    "create-aether-app": "./dist/bin.js",
+    "aether": "./dist/bin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "bin.js",
+    "dist/",
+    "src/",
+    "templates/"
+  ],
+  "scripts": {
+    "build": "esbuild index.ts --bundle --platform=node --outdir=dist --format=esm --external:cac --external:prompts --external:kleur --external:fs/promises --external:path --external:url",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "aether",
+    "cli",
+    "scaffolding",
+    "template"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "cac": "^6.7.14",
+    "prompts": "^2.4.2",
+    "kleur": "^4.1.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "esbuild": "^0.19.0"
+  }
+}

@@ -3,17 +3,26 @@
   "version": "0.1.0",
   "description": "Aether compiler - Babel plugin for macro transformation",
   "type": "module",
-  "main": "src/index.js",
+  "main": "src/index.ts",
+  "types": "src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./src/index.js"
+      "import": "./src/index.ts"
     }
   },
   "scripts": {
-    "build": "echo 'compiler is plain JS, no build needed'"
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "@babel/core": "^7.29.0",
     "@babel/plugin-syntax-jsx": "^7.28.6"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@babel/core": "^7.29.0",
+    "@babel/types": "^7.29.0",
+    "@babel/traverse": "^7.29.0",
+    "@types/node": "^22.0.0"
   }
 }

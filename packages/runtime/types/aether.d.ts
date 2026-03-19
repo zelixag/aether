@@ -52,7 +52,7 @@ declare module 'aether' {
    * store.count++        // 细粒度更新
    * store.user = { name: 'aether' }
    */
-  export function $store<T extends Record<string, any>>(initialState: T): T;
+  export function $store<T extends Record<string, unknown>>(initialState: T): T;
 
   /**
    * 声明异步数据源
@@ -81,7 +81,7 @@ declare module 'aether' {
    *   .btn { background: blue; }
    * `
    */
-  export function $style(strings: TemplateStringsArray, ...values: any[]): {
+  export function $style(strings: TemplateStringsArray, ...values: unknown[]): {
     scope: string;
   };
 
@@ -96,7 +96,7 @@ declare module 'aether' {
    * mount(App, '#app')
    */
   export function mount(
-    component: (props?: any) => Node,
+    component: (props?: unknown) => Node | Node[],
     container: string | Element
   ): { unmount: () => void };
 
@@ -115,7 +115,7 @@ declare module 'aether' {
   export function Link(props: {
     to: string;
     replace?: boolean;
-    children?: any;
+    children?: unknown;
   }): HTMLAnchorElement;
 
   // ============================================
@@ -138,6 +138,56 @@ declare module 'aether' {
     constructor(fn: () => void | (() => void));
     dispose(): void;
   }
+
+  export class ComponentContext {
+    addEffect(effect: Effect): void;
+    addChild(child: ComponentContext | { dispose?: () => void } | Node): void;
+    dispose(): void;
+  }
+
+  // ============================================
+  // 运行时导出
+  // ============================================
+
+  export {
+    __effect,
+    __derived,
+    __signal,
+    __flush,
+    __batch,
+    __pushEffect,
+    __popEffect,
+    __store,
+    __async,
+    __pauseScheduling,
+    __resumeScheduling,
+    __clearHmrCache,
+    __createElement,
+    __createText,
+    __setAttr,
+    __bindText,
+    __bindAttr,
+    __conditional,
+    __list,
+    __createComponent,
+    __spreadAttrs,
+    __hmrApply,
+    __injectStyle,
+    __removeStyle,
+    __scopeId,
+    __router,
+    __routePath,
+    __routeParams,
+    __routeQuery,
+    Button,
+    Input,
+    Card,
+    CardHeader,
+    CardBody,
+    CardFooter
+  };
+
+  export type { AsyncResource } from '../src/signal.js';
 }
 
 // ============================================
@@ -145,8 +195,96 @@ declare module 'aether' {
 // ============================================
 declare namespace JSX {
   interface IntrinsicElements {
-    [elemName: string]: any;
+    [elemName: string]: unknown;
   }
 
   interface Element extends Node {}
+}
+
+// ============================================
+// SSR 模块类型
+// ============================================
+declare module 'aether/ssr' {
+  import type { AsyncResource } from '../src/signal.js';
+
+  /**
+   * 将组件渲染为 HTML 字符串（服务端）
+   *
+   * @example
+   * import { renderToString } from 'aether/ssr';
+   *
+   * const html = await renderToString(() => <App />);
+   */
+  export function renderToString(componentFn: () => unknown): Promise<string>;
+
+  /**
+   * 将组件渲染为流（服务端）
+   *
+   * @example
+   * import { renderToStream } from 'aether/ssr';
+   *
+   * const stream = renderToStream(() => <App />);
+   * stream.pipe(res);
+   */
+  export function renderToStream(componentFn: () => unknown): ReadableStream;
+
+  /**
+   * 激活服务端渲染的 HTML（客户端）
+   *
+   * @example
+   * import { hydrate } from 'aether/ssr';
+   *
+   * hydrate(() => <App />, document.getElementById('app'));
+   */
+  export function hydrate(componentFn: () => unknown, container: Element | null): void;
+
+  /**
+   * 判断当前是否处于 SSR 模式
+   */
+  export function isSSR(): boolean;
+
+  /**
+   * 判断当前是否处于 Hydration 模式
+   */
+  export function isHydrating(): boolean;
+
+  /**
+   * 序列化 SSR 数据（用于嵌入到页面）
+   */
+  export function serializeSSRData(data: Record<string, unknown>): string;
+
+  /**
+   * 反序列化 SSR 数据（客户端 hydration 使用）
+   */
+  export function deserializeSSRData(): Record<string, unknown>;
+
+  /**
+   * 异步资源类型
+   */
+  export type { AsyncResource };
+
+  // SSR 内部函数（供编译器生成的代码使用）
+  export function __createElement(tag: string): unknown;
+  export function __createText(value: unknown): unknown;
+  export function __setAttr(el: unknown, name: string, value: unknown): void;
+  export function __bindText(node: unknown, getter: () => unknown): void;
+  export function __bindAttr(el: unknown, name: string, getter: () => unknown): void;
+  export function __conditional(
+    anchor: unknown,
+    getter: () => boolean,
+    trueBranch: (() => unknown) | null,
+    falseBranch: (() => unknown) | null
+  ): unknown;
+  export function __list<T>(
+    anchor: unknown,
+    listGetter: () => T[],
+    keyFn: ((item: T, index: number) => string | number) | null,
+    renderFn: (item: T, index: number, ctx: unknown) => unknown
+  ): unknown;
+  export function __createComponent(setupFn: (ctx: unknown) => unknown): unknown;
+  export function __spreadAttrs(el: unknown, attrs: Record<string, unknown> | null | undefined): void;
+  export function __effect(fn: () => void | (() => void)): { dispose: () => void };
+  export function __async<T>(fetcher: () => Promise<T>): AsyncResource<T>;
+  export const __isSSR: boolean;
+  export function __isHydrating(): boolean;
 }

@@ -1,0 +1,30 @@
+{
+  "name": "@aether/adapter-react",
+  "version": "0.1.0",
+  "description": "React adapter for Aether framework - enabling React/Aether interoperability",
+  "type": "module",
+  "main": "dist/adapter-react.js",
+  "module": "dist/adapter-react.js",
+  "exports": {
+    ".": {
+      "import": "./dist/adapter-react.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && node build.mjs",
+    "build:ts": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "files": ["dist", "types"]
+}

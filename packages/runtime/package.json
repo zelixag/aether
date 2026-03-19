@@ -3,22 +3,34 @@
   "version": "0.1.0",
   "description": "Aether - compile-time reactive framework",
   "type": "module",
-  "main": "src/index.js",
-  "module": "src/index.js",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./src/index.js"
+      "import": "./src/index.ts"
     },
     "./runtime": {
-      "import": "./src/internal.js"
+      "import": "./src/internal.ts"
     },
     "./dom": {
-      "import": "./src/dom.js"
+      "import": "./src/dom.ts"
+    },
+    "./ssr": {
+      "import": "./src/ssr.ts"
     }
   },
   "scripts": {
-    "build": "echo 'runtime is plain JS, no build needed'"
+    "build": "node build.mjs",
+    "build:ts": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "typecheck": "tsc --noEmit"
   },
   "types": "types/aether.d.ts",
-  "files": ["src", "types"]
+  "files": [
+    "src",
+    "types"
+  ],
+  "dependencies": {
+    "esbuild": "^0.27.4"
+  }
 }

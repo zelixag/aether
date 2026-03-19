@@ -9,9 +9,25 @@
     "build:runtime": "cd packages/runtime && npm run build",
     "build:compiler": "cd packages/compiler && npm run build",
     "build": "npm run build:runtime && npm run build:compiler",
+    "build:ts": "npm run build",
+    "typecheck": "npm run typecheck:runtime && npm run typecheck:compiler",
+    "typecheck:runtime": "cd packages/runtime && npm run typecheck",
+    "typecheck:compiler": "cd packages/compiler && npm run typecheck",
     "test:runtime": "cd packages/runtime && node test/test-signal.js",
+    "test:runtime:advanced": "cd packages/runtime && node test/test-signal-advanced.js",
+    "test:runtime:security": "cd packages/runtime && node test/test-security.js",
+    "test:runtime:performance": "cd packages/runtime && node test/test-performance.js",
+    "test:compiler:advanced": "cd packages/compiler && node test/test-macros.js && node test/test-jsx-advanced.js",
     "test:compiler": "cd packages/compiler && node test/test-transform.js && node test/test-jsx.js",
     "test": "npm run test:runtime && npm run test:compiler",
+    "test:all": "npm run test:runtime && npm run test:runtime:advanced && npm run test:runtime:security && npm run test:compiler && npm run test:compiler:advanced",
     "example:counter": "cd examples/counter && npm run dev"
+  },
+  "dependencies": {
+    "browserslist": "^4.28.1",
+    "caniuse-lite": "^1.0.30001780"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.28.5"
   }
 }
