@@ -19,22 +19,29 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/$state' },
+      { text: 'Architecture', link: '/architecture' },
+      { text: 'RFC', link: '/rfc/ROADMAP' },
       { text: 'Examples', link: '/examples/counter' },
       { text: 'GitHub', link: 'https://github.com/zelixag/aether' },
     ],
     sidebar: {
       '/api/': [
         {
-          text: 'API Reference',
+          text: 'Reactive Macros',
           items: [
             { text: '$state', link: '/api/$state' },
             { text: '$derived', link: '/api/$derived' },
             { text: '$effect', link: '/api/$effect' },
+          ]
+        },
+        {
+          text: 'Built-in Features',
+          items: [
             { text: '$store', link: '/api/$store' },
             { text: '$async', link: '/api/$async' },
             { text: '$style', link: '/api/$style' },
-            { text: 'mount', link: '/api/mount' },
             { text: 'Router', link: '/api/router' },
+            { text: 'mount', link: '/api/mount' },
           ]
         }
       ],
@@ -43,7 +50,27 @@ export default defineConfig({
           text: 'Getting Started',
           items: [
             { text: 'Introduction', link: '/guide/getting-started' },
-            { text: 'Concepts', link: '/guide/concepts' },
+            { text: 'Core Concepts', link: '/guide/concepts' },
+          ]
+        }
+      ],
+      '/architecture': [
+        {
+          text: 'Deep Dive',
+          items: [
+            { text: 'Architecture', link: '/architecture' },
+            { text: 'Performance', link: '/performance' },
+          ]
+        }
+      ],
+      '/rfc/': [
+        {
+          text: 'RFC & Roadmap',
+          items: [
+            { text: 'Roadmap', link: '/rfc/ROADMAP' },
+            { text: 'Competitive Analysis', link: '/rfc/COMPETITIVE-ANALYSIS' },
+            { text: 'RFC-001: SSR Support', link: '/rfc/001-ssr-support' },
+            { text: 'RFC-002: CLI Scaffolding', link: '/rfc/002-cli-scaffolding' },
           ]
         }
       ],
