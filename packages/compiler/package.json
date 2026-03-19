@@ -1,0 +1,19 @@
+{
+  "name": "aether-compiler",
+  "version": "0.1.0",
+  "description": "Aether compiler - Babel plugin for macro transformation",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": {
+      "import": "./src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "echo 'compiler is plain JS, no build needed'"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/plugin-syntax-jsx": "^7.28.6"
+  }
+}

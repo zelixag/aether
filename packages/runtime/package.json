@@ -1,0 +1,23 @@
+{
+  "name": "aether",
+  "version": "0.1.0",
+  "description": "Aether - compile-time reactive framework",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "exports": {
+    ".": {
+      "import": "./src/index.js"
+    },
+    "./runtime": {
+      "import": "./src/internal.js"
+    },
+    "./dom": {
+      "import": "./src/dom.js"
+    }
+  },
+  "scripts": {
+    "build": "echo 'runtime is plain JS, no build needed'"
+  },
+  "files": ["src"]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "aether-framework",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build:runtime": "cd packages/runtime && npm run build",
+    "build:compiler": "cd packages/compiler && npm run build",
+    "build": "npm run build:runtime && npm run build:compiler",
+    "test:runtime": "cd packages/runtime && node test/test-signal.js",
+    "test:compiler": "cd packages/compiler && node test/test-transform.js && node test/test-jsx.js",
+    "test": "npm run test:runtime && npm run test:compiler",
+    "example:counter": "cd examples/counter && npm run dev"
+  }
+}
