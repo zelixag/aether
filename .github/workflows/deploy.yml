@@ -41,8 +41,7 @@ jobs:
         run: pnpm run docs:build
 
       - name: Build counter example
-        run: pnpm run build:example
-        working-directory: ./examples/counter
+        run: cd examples/counter && pnpm install && pnpm run build
 
       - name: Copy counter example to docs/.vitepress/public/examples
         run: |
