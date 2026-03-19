@@ -2,11 +2,11 @@
   "name": "@zhenglinxiong/aether-compiler",
   "version": "0.1.0",
   "description": "Aether compiler - Babel plugin for macro transformation",
-  "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.cjs"
     }
   },
   "files": [
