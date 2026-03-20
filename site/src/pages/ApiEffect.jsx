@@ -1,6 +1,7 @@
 import { $state, $effect } from 'aether'
 import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
 import { DocPage, H1, H2, P, Note } from '../components/DocPage.jsx'
+import { colors, fonts } from '../styles.js'
 
 export function ApiEffect() {
   let ticks = $state(0)
@@ -43,10 +44,10 @@ $effect(() => {
 })`} />
 
       <H2>Live Demo</H2>
-      <div style="margin: 1rem 0; padding: 1.5rem; border: 1px solid #2a2a2a; border-radius: 8px; background: #141414; text-align: center">
-        <div style="font-size: 0.8rem; color: #888; margin-bottom: 0.5rem">Timer (auto-incrementing via $effect)</div>
-        <div style="font-size: 2.5rem; font-weight: 700; color: #c45d35; font-family: 'SF Mono', monospace">{ticks}</div>
-        <div style="font-size: 0.75rem; color: #666; margin-top: 0.5rem">seconds since page load</div>
+      <div style={`margin: 1rem 0; padding: 1.5rem; border: 1px solid ${colors.border}; border-radius: 8px; background: ${colors.codeBg}; text-align: center`}>
+        <div style={`font-size: 0.8rem; color: ${colors.textDim}; margin-bottom: 0.5rem`}>Timer (auto-incrementing via $effect)</div>
+        <div style={`font-size: 2.5rem; font-weight: 700; color: ${colors.accent}; font-family: ${fonts.mono}`}>{ticks}</div>
+        <div style={`font-size: 0.75rem; color: ${colors.textDim}; margin-top: 0.5rem`}>seconds since page load</div>
       </div>
 
       <H2>Compilation</H2>

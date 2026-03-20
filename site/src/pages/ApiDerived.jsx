@@ -1,6 +1,7 @@
 import { $state, $derived } from 'aether'
 import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
 import { DocPage, H1, H2, P, Note } from '../components/DocPage.jsx'
+import { colors } from '../styles.js'
 
 export function ApiDerived() {
   let a = $state(3)
@@ -27,26 +28,26 @@ firstName = 'Jane'
 console.log(fullName) // "Jane Doe" — auto-updated`} />
 
       <H2>Live Demo</H2>
-      <div style="margin: 1rem 0; padding: 1.5rem; border: 1px solid #2a2a2a; border-radius: 8px; background: #141414; text-align: center">
+      <div style={`margin: 1rem 0; padding: 1.5rem; border: 1px solid ${colors.border}; border-radius: 8px; background: ${colors.codeBg}; text-align: center`}>
         <div style="display: flex; gap: 2rem; justify-content: center; align-items: center; margin-bottom: 1rem">
           <div>
-            <div style="font-size: 0.75rem; color: #888; margin-bottom: 0.25rem">a</div>
-            <div style="font-size: 1.5rem; font-weight: 700; color: #e5e5e5">{a}</div>
+            <div style={`font-size: 0.75rem; color: ${colors.textDim}; margin-bottom: 0.25rem`}>a</div>
+            <div style={`font-size: 1.5rem; font-weight: 700; color: ${colors.text}`}>{a}</div>
           </div>
-          <div style="font-size: 1.2rem; color: #666">+</div>
+          <div style={`font-size: 1.2rem; color: ${colors.textDim}`}>+</div>
           <div>
-            <div style="font-size: 0.75rem; color: #888; margin-bottom: 0.25rem">b</div>
-            <div style="font-size: 1.5rem; font-weight: 700; color: #e5e5e5">{b}</div>
+            <div style={`font-size: 0.75rem; color: ${colors.textDim}; margin-bottom: 0.25rem`}>b</div>
+            <div style={`font-size: 1.5rem; font-weight: 700; color: ${colors.text}`}>{b}</div>
           </div>
-          <div style="font-size: 1.2rem; color: #666">=</div>
+          <div style={`font-size: 1.2rem; color: ${colors.textDim}`}>=</div>
           <div>
-            <div style="font-size: 0.75rem; color: #888; margin-bottom: 0.25rem">sum (derived)</div>
-            <div style="font-size: 1.5rem; font-weight: 700; color: #c45d35">{sum}</div>
+            <div style={`font-size: 0.75rem; color: ${colors.textDim}; margin-bottom: 0.25rem`}>sum (derived)</div>
+            <div style={`font-size: 1.5rem; font-weight: 700; color: ${colors.accent}`}>{sum}</div>
           </div>
         </div>
         <div style="display: flex; gap: 0.5rem; justify-content: center">
-          <button onClick={() => a++} style="padding: 0.4rem 1rem; border-radius: 6px; border: none; background: #c45d35; color: white; cursor: pointer">a++</button>
-          <button onClick={() => b++} style="padding: 0.4rem 1rem; border-radius: 6px; border: none; background: #c45d35; color: white; cursor: pointer">b++</button>
+          <button onClick={() => a++} style={`padding: 0.4rem 1rem; border-radius: 6px; border: none; background: ${colors.accent}; color: white; cursor: pointer`}>a++</button>
+          <button onClick={() => b++} style={`padding: 0.4rem 1rem; border-radius: 6px; border: none; background: ${colors.accent}; color: white; cursor: pointer`}>b++</button>
         </div>
       </div>
 

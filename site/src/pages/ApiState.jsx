@@ -1,9 +1,9 @@
 import { $state } from 'aether'
 import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
 import { DocPage, H1, H2, P, Note } from '../components/DocPage.jsx'
+import { colors } from '../styles.js'
 
 export function ApiState() {
-  // Live demo
   let demo = $state(0)
 
   return (
@@ -34,12 +34,12 @@ let items = $state([1, 2, 3])
 items = [...items, 4]  // triggers update`} />
 
       <H2>Live Demo</H2>
-      <div style="margin: 1rem 0; padding: 1.5rem; border: 1px solid #2a2a2a; border-radius: 8px; background: #141414; text-align: center">
-        <div style="font-size: 2rem; font-weight: 700; color: #c45d35; margin-bottom: 1rem">{demo}</div>
+      <div style={`margin: 1rem 0; padding: 1.5rem; border: 1px solid ${colors.border}; border-radius: 8px; background: ${colors.codeBg}; text-align: center`}>
+        <div style={`font-size: 2rem; font-weight: 700; color: ${colors.accent}; margin-bottom: 1rem`}>{demo}</div>
         <div style="display: flex; gap: 0.5rem; justify-content: center">
-          <button onClick={() => demo--} style="padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid #333; background: #1a1a1a; color: #e5e5e5; cursor: pointer">-1</button>
-          <button onClick={() => demo = 0} style="padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid #333; background: #1a1a1a; color: #e5e5e5; cursor: pointer">Reset</button>
-          <button onClick={() => demo++} style="padding: 0.4rem 1rem; border-radius: 6px; border: none; background: #c45d35; color: white; cursor: pointer">+1</button>
+          <button onClick={() => demo--} style={`padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid ${colors.border}; background: transparent; color: ${colors.text}; cursor: pointer`}>-1</button>
+          <button onClick={() => demo = 0} style={`padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid ${colors.border}; background: transparent; color: ${colors.text}; cursor: pointer`}>Reset</button>
+          <button onClick={() => demo++} style={`padding: 0.4rem 1rem; border-radius: 6px; border: none; background: ${colors.accent}; color: white; cursor: pointer`}>+1</button>
         </div>
       </div>
 

@@ -33,7 +33,7 @@ count.value++`
     { icon: '\u26A1', title: 'Compile-time Transforms', desc: 'Macros like $state are transformed at build time. Zero runtime overhead for the reactive system.' },
     { icon: '\uD83C\uDFAF', title: 'Fine-grained Updates', desc: 'No virtual DOM diffing. Each signal update directly modifies the exact DOM node that changed.' },
     { icon: '\uD83D\uDCE6', title: 'Runtime < 3KB', desc: 'The entire runtime is a minimal pub/sub system. Everything else is handled at compile time.' },
-    { icon: '\uD83D\uDD27', title: 'Built-in Everything', desc: 'Router, state management, scoped styles — all built-in with the same macro syntax.' },
+    { icon: '\uD83D\uDD27', title: 'Built-in Everything', desc: 'Router, state management, scoped styles \u2014 all built-in with the same macro syntax.' },
     { icon: '\uD83E\uDD16', title: 'AI-Friendly', desc: 'Deterministic compilation makes it easy for AI to predict the output. Fewer bugs, faster iteration.' },
     { icon: '\uD83D\uDCDD', title: 'TypeScript Native', desc: '100% TypeScript throughout. Full type inference for all macros without extra generics.' },
   ]
@@ -103,7 +103,7 @@ count.value++`
       `}>
         <div style={`
           padding: 1.25rem 1.5rem; border-radius: 10px;
-          border: 1px solid ${colors.border}; background: #111;
+          border: 1px solid ${colors.border}; background: ${colors.codeBg};
           text-align: center; flex: 1;
         `}>
           <div style={`font-size: 2.5rem; font-weight: 700; color: ${colors.accent}; margin-bottom: 0.25rem; font-family: ${fonts.mono}`}>
@@ -127,7 +127,7 @@ count.value++`
                     `}>+</button>
           </div>
         </div>
-        <div style={`flex: 1.4; min-width: 0`}>
+        <div style="flex: 1.4; min-width: 0">
           <CodeBlock code={compileCode} title="What the compiler does" />
         </div>
       </section>
@@ -149,16 +149,12 @@ count.value++`
           Designed for humans, browsers, and AI.
         </p>
 
-        <div style={`
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 0.75rem;
-        `}>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem">
           {features.map(f => (
             <div style={`
               padding: 1.25rem; border-radius: 8px;
               border: 1px solid ${colors.border};
-              background: #111;
+              background: ${colors.codeBg};
             `}>
               <div style="font-size: 1.25rem; margin-bottom: 0.5rem">{f.icon}</div>
               <h3 style={`font-size: 0.875rem; font-weight: 600; margin-bottom: 0.375rem; color: ${colors.text}`}>

@@ -1,7 +1,9 @@
 import { $state } from 'aether'
-import { colors } from '../styles.js'
+import { colors, toggleTheme, getTheme } from '../styles.js'
 
 export function Navbar({ onNavigate, currentRoute }) {
+  let theme = $state(getTheme())
+
   const navLinks = [
     { label: 'Guide', path: '/guide/getting-started' },
     { label: 'API', path: '/api/state' },
@@ -13,10 +15,14 @@ export function Navbar({ onNavigate, currentRoute }) {
     return currentRoute.startsWith(path.split('/').slice(0, 3).join('/'))
   }
 
+  const handleToggle = () => {
+    theme = toggleTheme()
+  }
+
   return (
     <header style={`
       position: sticky; top: 0; z-index: 100;
-      background: rgba(10, 10, 10, 0.88);
+      background: ${colors.navBg};
       backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid ${colors.border};
       height: 56px;
@@ -43,12 +49,27 @@ export function Navbar({ onNavigate, currentRoute }) {
                  font-size: 0.8125rem; font-weight: 500; transition: all 0.15s;
                  text-decoration: none;
                  color: ${isActive(link.path) ? colors.text : colors.textMuted};
-                 background: ${isActive(link.path) ? 'rgba(255,255,255,0.06)' : 'transparent'};
+                 background: ${isActive(link.path) ? colors.activeBg : 'transparent'};
                `}>
               {link.label}
             </a>
           ))}
-          <div style="width: 1px; height: 16px; background: #333; margin: 0 0.375rem"></div>
+
+          <div style={`width: 1px; height: 16px; background: ${colors.border}; margin: 0 0.375rem`}></div>
+
+          <button onClick={handleToggle}
+                  title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                  style={`
+                    width: 32px; height: 32px; border-radius: 6px; border: 1px solid ${colors.border};
+                    background: transparent; cursor: pointer;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 0.9rem; line-height: 1;
+                    color: ${colors.textMuted};
+                    transition: all 0.15s;
+                  `}>
+            {theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19'}
+          </button>
+
           <a href="https://github.com/zelixag/aether"
              target="_blank"
              style={`

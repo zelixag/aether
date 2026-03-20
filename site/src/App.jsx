@@ -11,6 +11,9 @@ import { ApiStore } from './pages/ApiStore.jsx'
 import { ApiMount } from './pages/ApiMount.jsx'
 import { ApiRouter } from './pages/ApiRouter.jsx'
 import { Architecture } from './pages/Architecture.jsx'
+import { colors, initTheme } from './styles.js'
+
+initTheme()
 
 function getRoute() {
   const hash = window.location.hash.slice(1) || '/'
@@ -32,7 +35,7 @@ export function App() {
   }
 
   return (
-    <div style="min-height: 100vh; display: flex; flex-direction: column; background: #0a0a0a">
+    <div style={`min-height: 100vh; display: flex; flex-direction: column; background: ${colors.bg}`}>
       <Navbar onNavigate={navigateTo} currentRoute={route} />
       {isHome
         ? <Home onNavigate={navigateTo} />
