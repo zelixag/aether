@@ -13,7 +13,8 @@ export type { AsyncResource } from './signal.ts';
 export {
   mount, __createElement, __createText, __setAttr,
   __bindText, __bindAttr, __conditional, __list,
-  __createComponent, __spreadAttrs, ComponentContext
+  __createComponent, __spreadAttrs, ComponentContext,
+  __child, __bindChild
 } from './dom.ts';
 
 export { navigate, Link, __router, __routePath, __routeParams, __routeQuery } from './router.ts';

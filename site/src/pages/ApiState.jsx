@@ -1,0 +1,67 @@
+import { $state } from 'aether'
+import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
+import { DocPage, H1, H2, P, Note } from '../components/DocPage.jsx'
+import { colors, fonts } from '../styles.js'
+
+export function ApiState() {
+  let demo = $state(0)
+
+  return (
+    <DocPage>
+      <H1>$state</H1>
+      <P>Declares a reactive state variable. The compiler transforms reads and writes to signal operations at build time.</P>
+
+      <H2>Syntax</H2>
+      <CodeBlock code={`let variableName = $state(initialValue)`} />
+
+      <H2>Parameters</H2>
+      <P><InlineCode>initialValue</InlineCode> — The initial value of the state. Can be any type: number, string, object, array, etc.</P>
+
+      <H2>Usage</H2>
+      <CodeBlock code={`import { $state } from 'aether'
+
+// Primitive
+let count = $state(0)
+count++          // triggers update
+count = 10       // triggers update
+
+// Object
+let user = $state({ name: 'Alice', age: 25 })
+user = { ...user, age: 26 }  // triggers update
+
+// Array
+let items = $state([1, 2, 3])
+items = [...items, 4]  // triggers update`} />
+
+      <H2>Live Demo</H2>
+      <div style={`
+        margin: 1.25rem 0; padding: 2rem; text-align: center;
+        border: 1px solid ${colors.border}; border-radius: 20px;
+        background: ${colors.bgSurface};
+        box-shadow: 4px 4px 0 ${colors.shadow};
+      `}>
+        <div style={`font-family: ${fonts.display}; font-size: 3rem; font-weight: 700; color: ${colors.text}; margin-bottom: 0.75rem`}>{demo}</div>
+        <div style="display: flex; gap: 0.625rem; justify-content: center">
+          <button onClick={() => demo--} style={`padding: 0.5rem 1.125rem; border-radius: 8px; border: 2px solid ${colors.text}; background: ${colors.bgSurface}; color: ${colors.text}; cursor: pointer; font-weight: 600; font-family: inherit`}>-1</button>
+          <button onClick={() => demo = 0} style={`padding: 0.5rem 1.125rem; border-radius: 8px; border: 2px solid transparent; background: transparent; color: ${colors.textMuted}; cursor: pointer; font-family: inherit`}>Reset</button>
+          <button onClick={() => demo++} style={`padding: 0.5rem 1.125rem; border-radius: 8px; border: 2px solid ${colors.accent}; background: ${colors.accent}; color: white; cursor: pointer; font-weight: 600; font-family: inherit; box-shadow: 3px 3px 0 ${colors.accentMuted}`}>+1</button>
+        </div>
+      </div>
+
+      <H2>Compilation</H2>
+      <CodeBlock code={`// Source
+let count = $state(0)
+console.log(count)
+count++
+
+// Compiled output
+let count = __signal(0)
+console.log(count.value)
+count.value++`} title="Before \u2192 After" />
+
+      <Note>
+        <strong>Important:</strong> <InlineCode>$state</InlineCode> must be used with <InlineCode>let</InlineCode>, not <InlineCode>const</InlineCode>, since the variable will be reassigned.
+      </Note>
+    </DocPage>
+  )
+}

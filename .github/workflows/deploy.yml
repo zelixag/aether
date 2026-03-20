@@ -41,7 +41,6 @@ jobs:
         run: |
           rm -rf packages/compiler/dist
           rm -rf packages/runtime/dist
-          rm -rf examples/counter/node_modules
 
       - name: Build compiler package
         run: pnpm run build:compiler
@@ -49,24 +48,13 @@ jobs:
       - name: Build runtime package
         run: pnpm run build:runtime
 
-      - name: Build documentation
-        run: pnpm run docs:build
-
-      - name: Build counter example
-        run: |
-          cd examples/counter
-          pnpm install --no-frozen-lockfile
-          pnpm run build
-
-      - name: Copy counter example to docs/.vitepress/public/examples
-        run: |
-          mkdir -p docs/.vitepress/public/examples
-          cp -r examples/counter/dist/* docs/.vitepress/public/examples/
+      - name: Build site (Aether-powered)
+        run: cd site && pnpm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/.vitepress/dist
+          path: site/dist
 
   deploy:
     environment:

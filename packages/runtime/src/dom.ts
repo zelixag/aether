@@ -4,7 +4,10 @@
 import { __effect, Effect } from './signal.ts';
 
 // DEV 模式性能标记
-const __DEV__: boolean = typeof process !== 'undefined' && process.env.NODE_ENV !== 'production';
+// Use a function to avoid minifier bug that transforms 'undefined' to template literal
+const __DEV__: boolean = (() => {
+  try { return process?.env?.NODE_ENV !== 'production'; } catch { return false; }
+})();
 
 function __mark(label: string): void {
   if (__DEV__ && performance) {
@@ -167,6 +170,75 @@ export function __setAttr(el: HTMLElement, name: string, value: unknown): void {
     else el.removeAttribute(name);
   } else {
     el.setAttribute(name, String(value ?? ''));
+  }
+}
+
+// ============================================
+// 通用子节点插入（处理文本和 DOM 节点混合）
+// ============================================
+
+// 静态子节点插入：自动判断 Node vs 文本
+export function __child(parent: Node, value: unknown): void {
+  if (value == null || value === false || value === true) return;
+  if (value instanceof Node) {
+    parent.appendChild(value);
+  } else if (Array.isArray(value)) {
+    for (const item of value) {
+      __child(parent, item);
+    }
+  } else {
+    parent.appendChild(document.createTextNode(String(value)));
+  }
+}
+
+// 响应式子节点绑定：值变化时自动替换（支持 Node / 文本 / 数组）
+export function __bindChild(parent: Node, getter: () => unknown): { dispose: () => void } {
+  const anchor = document.createComment('');
+  parent.appendChild(anchor);
+
+  let currentNodes: Node[] = [];
+
+  const effect = __effect(() => {
+    const value = getter();
+
+    // 移除旧节点
+    for (const node of currentNodes) {
+      node.remove();
+    }
+    currentNodes = [];
+
+    // 插入新内容
+    __insertValue(value, parent, anchor, currentNodes);
+  });
+
+  if (currentComponent) {
+    currentComponent.addEffect(effect);
+  }
+
+  return {
+    dispose() {
+      effect.dispose();
+      for (const node of currentNodes) {
+        node.remove();
+      }
+      anchor.remove();
+    }
+  };
+}
+
+function __insertValue(value: unknown, parent: Node, anchor: Comment, nodes: Node[]): void {
+  if (value == null || value === false || value === true) return;
+  if (value instanceof Node) {
+    parent.insertBefore(value, anchor);
+    nodes.push(value);
+  } else if (Array.isArray(value)) {
+    for (const item of value) {
+      __insertValue(item, parent, anchor, nodes);
+    }
+  } else {
+    const t = document.createTextNode(String(value));
+    parent.insertBefore(t, anchor);
+    nodes.push(t);
   }
 }
 

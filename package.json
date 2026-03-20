@@ -22,11 +22,11 @@
     "test": "npm run test:runtime && npm run test:compiler",
     "test:all": "npm run test:runtime && npm run test:runtime:advanced && npm run test:runtime:security && npm run test:compiler && npm run test:compiler:advanced",
     "example:counter": "cd examples/counter && npm run dev",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs",
+    "site:dev": "cd site && npm run dev",
+    "site:build": "cd site && npm run build",
+    "site:preview": "cd site && npm run preview",
     "build:example": "cd examples/counter && npm run build",
-    "deploy": "npm run docs:build && npm run build:example"
+    "deploy": "npm run build && npm run site:build"
   },
   "dependencies": {
     "browserslist": "^4.28.1",

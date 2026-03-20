@@ -1,0 +1,202 @@
+import { $state } from 'aether'
+import { CodeBlock } from '../components/CodeBlock.jsx'
+import { colors, fonts } from '../styles.js'
+
+export function Home({ onNavigate }) {
+  let count = $state(0)
+
+  const heroCode = `import { $state, $derived, mount } from 'aether'
+
+function Counter() {
+  let count = $state(0)
+  let double = $derived(() => count * 2)
+
+  return (
+    <div>
+      <p>Count: {count} (double: {double})</p>
+      <button onClick={() => count++}>+1</button>
+    </div>
+  )
+}
+
+mount(Counter, '#app')`
+
+  const compileCode = `// Your code
+let count = $state(0)
+count++
+
+// Compiled output
+let count = __signal(0)
+count.value++`
+
+  const features = [
+    { num: '01', icon: '\u26A1', title: 'Lightning Fast', desc: 'No virtual DOM diffing. Direct DOM operations with compile-time optimizations.' },
+    { num: '02', icon: '\uD83C\uDFAF', title: 'Type Safe', desc: '100% TypeScript throughout. Full IDE support with zero runtime overhead.' },
+    { num: '03', icon: '\u2728', title: 'Magic Macros', desc: '$state, $derived, $effect \u2014 write reactive code that looks like regular JavaScript.' },
+  ]
+
+  return (
+    <div>
+      <section style="max-width: 1200px; margin: 0 auto; padding: 5rem 2rem 4rem">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center">
+          <div style="max-width: 520px">
+            <div style={`
+              display: inline-flex; align-items: center; gap: 0.625rem;
+              font-size: 0.8125rem; font-weight: 600; color: ${colors.accent};
+              text-transform: uppercase; letter-spacing: 0.15em;
+              margin-bottom: 1.5rem;
+            `}>
+              <span style={`width: 32px; height: 2px; background: ${colors.accent}`}></span>
+              Compile-time Reactive
+            </div>
+
+            <h1 style={`
+              font-family: ${fonts.display}; font-size: clamp(2.5rem, 5vw, 3.75rem);
+              font-weight: 700; letter-spacing: -0.03em;
+              line-height: 1.05; margin-bottom: 1.5rem; color: ${colors.text};
+            `}>
+              Build faster with <span style={`color: ${colors.accent}; font-style: italic`}>Aether</span>
+            </h1>
+
+            <p style={`
+              font-size: 1.125rem; color: ${colors.textMuted};
+              line-height: 1.65; margin-bottom: 2.5rem; max-width: 460px;
+            `}>
+              No virtual DOM. No hooks rules. Just pure reactive magic
+              that compiles to vanilla JavaScript.
+            </p>
+
+            <div style="display: flex; gap: 0.875rem">
+              <button onClick={() => onNavigate('/guide/getting-started')}
+                      style={`
+                        padding: 0.875rem 1.5rem; border-radius: 10px;
+                        border: 2px solid ${colors.accent};
+                        background: ${colors.accent}; color: white;
+                        font-size: 0.9375rem; font-weight: 600; cursor: pointer;
+                        font-family: inherit;
+                        box-shadow: 4px 4px 0 ${colors.accentMuted};
+                        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+                      `}>
+                Get Started
+              </button>
+              <a href="https://github.com/zelixag/aether" target="_blank"
+                 style={`
+                   padding: 0.875rem 1.5rem; border-radius: 10px;
+                   border: 2px solid ${colors.text}; background: ${colors.bgSurface};
+                   color: ${colors.text}; font-size: 0.9375rem; font-weight: 600;
+                   cursor: pointer; text-decoration: none;
+                   display: inline-flex; align-items: center;
+                   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+                 `}>
+                View Source
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <div style={`
+              background: ${colors.bgSurface};
+              border: 1px solid ${colors.border}; border-radius: 24px;
+              padding: 3rem; position: relative; text-align: center;
+              box-shadow: 8px 8px 0 ${colors.border}, 16px 16px 0 ${colors.shadowAccent};
+            `}>
+              <p style={`
+                font-size: 0.8125rem; font-weight: 600; color: ${colors.textDim};
+                text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;
+              `}>Current Count</p>
+              <p style={`
+                font-family: ${fonts.display}; font-size: clamp(5rem, 10vw, 7rem);
+                font-weight: 700; letter-spacing: -0.04em; line-height: 0.9;
+                color: ${colors.text};
+              `}>{count}</p>
+              <p style={`
+                font-size: 1rem; color: ${colors.accentWarm}; margin-top: 1rem;
+                font-weight: 500; font-family: ${fonts.mono};
+              `}>
+                <span style={`color: ${colors.textDim}`}>double =</span> {count * 2}
+              </p>
+              <div style="display: flex; gap: 0.75rem; justify-content: center; margin-top: 2rem">
+                <button onClick={() => count--}
+                        style={`
+                          padding: 0.625rem 1.25rem; border-radius: 8px;
+                          border: 2px solid ${colors.text}; background: ${colors.bgSurface};
+                          color: ${colors.text}; font-size: 1rem; font-weight: 600;
+                          cursor: pointer; font-family: inherit;
+                          transition: all 0.2s;
+                        `}>\u2212</button>
+                <button onClick={() => count = 0}
+                        style={`
+                          padding: 0.625rem 1.25rem; border-radius: 8px;
+                          border: 2px solid transparent; background: transparent;
+                          color: ${colors.textMuted}; font-size: 0.875rem; font-weight: 500;
+                          cursor: pointer; font-family: inherit;
+                        `}>Reset</button>
+                <button onClick={() => count++}
+                        style={`
+                          padding: 0.625rem 1.25rem; border-radius: 8px;
+                          border: 2px solid ${colors.accent}; background: ${colors.accent};
+                          color: white; font-size: 1rem; font-weight: 600;
+                          cursor: pointer; font-family: inherit;
+                          box-shadow: 3px 3px 0 ${colors.accentMuted};
+                          transition: all 0.2s;
+                        `}>+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style="max-width: 1200px; margin: 0 auto; padding: 0 2rem 4rem">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem">
+          {features.map(f => (
+            <div style={`
+              background: ${colors.bgSurface};
+              border: 1px solid ${colors.border}; border-radius: 20px;
+              padding: 2rem; position: relative;
+              transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            `}>
+              <span style={`
+                font-family: ${fonts.display}; font-size: 3rem; font-weight: 700;
+                color: ${colors.border}; position: absolute; top: 0.75rem; right: 1.25rem;
+                line-height: 1;
+              `}>{f.num}</span>
+              <div style={`
+                width: 48px; height: 48px;
+                background: ${colors.bg}; border: 1px solid ${colors.border};
+                border-radius: 14px; display: flex; align-items: center; justify-content: center;
+                margin-bottom: 1.25rem; font-size: 1.25rem;
+              `}>{f.icon}</div>
+              <h3 style={`
+                font-family: ${fonts.display}; font-size: 1.25rem; font-weight: 700;
+                margin-bottom: 0.5rem; color: ${colors.text};
+              `}>{f.title}</h3>
+              <p style={`font-size: 0.9rem; color: ${colors.textMuted}; line-height: 1.6; margin: 0`}>
+                {f.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style="max-width: 680px; margin: 0 auto; padding: 0 2rem 4rem">
+        <CodeBlock code={heroCode} title="Counter.jsx" />
+      </section>
+
+      <footer style={`
+        background: ${colors.text}; padding: 2.5rem 2rem;
+      `}>
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center">
+          <p style={`font-size: 0.9rem; color: ${colors.bg}; opacity: 0.7`}>
+            Built with <span style={`color: ${colors.accentWarm}; font-weight: 600`}>Aether</span>
+          </p>
+          <div style="display: flex; gap: 2rem">
+            <a href="https://github.com/zelixag/aether" target="_blank"
+               style={`font-size: 0.9rem; color: ${colors.bg}; opacity: 0.7; text-decoration: none`}>
+              GitHub
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}

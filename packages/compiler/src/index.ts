@@ -93,6 +93,22 @@ function aetherPlugin({ types: t }: { types: typeof BabelTypes }, options: Babel
           };
         },
         exit(path, state: PluginState) {
+          // 如果有 JSX 但没有 aether import，注入 DOM 运行时导入
+          if (!state.aether.macroImported && state.aether._needsDOM) {
+            const domImports = [
+              '__createElement', '__createText', '__setAttr',
+              '__bindText', '__bindAttr', '__createComponent',
+              '__conditional', '__list', '__spreadAttrs',
+              '__child', '__bindChild'
+            ];
+            const specifiers = domImports.map(name =>
+              t.importSpecifier(t.identifier(name), t.identifier(name))
+            );
+            path.node.body.unshift(
+              t.importDeclaration(specifiers, t.stringLiteral('aether'))
+            );
+            return;
+          }
           if (!state.aether.macroImported) return;
           // 重写导入：将 'aether' 导入替换为运行时内部导入
           rewriteImports(path, state, t);
@@ -216,8 +232,7 @@ function aetherPlugin({ types: t }: { types: typeof BabelTypes }, options: Babel
 
       // JSX 转换
       JSXElement(path, state: PluginState) {
-        if (!state.aether.macroImported) return;
-
+        // JSX 转换对所有 .jsx 文件生效，不仅限于 import 'aether' 的文件
         // SSR 模式: 使用 SSR 转换
         if (state.ssr.ssrMode && state.ssr.isServerComponent) {
           transformSSR.jsxElement(path, state, t);
@@ -228,8 +243,6 @@ function aetherPlugin({ types: t }: { types: typeof BabelTypes }, options: Babel
       },
 
       JSXFragment(path, state: PluginState) {
-        if (!state.aether.macroImported) return;
-
         // SSR 模式: 使用 SSR 转换
         if (state.ssr.ssrMode && state.ssr.isServerComponent) {
           transformSSR.jsxFragment(path, state, t);
@@ -345,6 +358,8 @@ function rewriteImports(programPath: NodePath<t.Program>, state: PluginState, t:
     runtimeImports.add('__conditional');
     runtimeImports.add('__list');
     runtimeImports.add('__spreadAttrs');
+    runtimeImports.add('__child');
+    runtimeImports.add('__bindChild');
   }
 
   // 保留非宏的导入（如 mount）
@@ -500,9 +515,12 @@ export function aetherVitePlugin(options: { ssr?: boolean } = {}) {
 
     config() {
       return {
-        // Vite 8+: use oxc instead of deprecated esbuild option
+        // 保留 JSX 给 Babel 处理，不让 esbuild/oxc 转换为 React.createElement
+        esbuild: {
+          jsx: 'preserve',
+        },
         oxc: {
-          jsx: 'preserve', // 保留 JSX 给 Babel 处理
+          jsx: 'preserve',
         },
       };
     },
@@ -510,10 +528,13 @@ export function aetherVitePlugin(options: { ssr?: boolean } = {}) {
     async transform(code: string, id: string) {
       if (!/\.[jt]sx?$/.test(id)) return null;
       if (id.includes('node_modules')) return null;
-      // 排除 runtime 和 compiler 包本身（它们已经是 TypeScript，不需要编译）
-      if (id.includes('/packages/runtime/src/')) return null;
-      if (id.includes('/packages/compiler/src/')) return null;
-      if (!code.includes('aether')) return null;
+      // 排除 runtime 和 compiler 包本身
+      if (id.includes('/packages/runtime/src/') || id.includes('\\packages\\runtime\\src\\')) return null;
+      if (id.includes('/packages/compiler/src/') || id.includes('\\packages\\compiler\\src\\')) return null;
+      // 处理所有 .jsx/.tsx 文件（JSX 转换）或包含 aether 导入的文件（宏转换）
+      const isJSX = /\.[jt]sx$/.test(id);
+      const hasAetherImport = code.includes('aether');
+      if (!isJSX && !hasAetherImport) return null;
 
       const babel = await import('@babel/core');
 

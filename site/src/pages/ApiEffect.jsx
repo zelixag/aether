@@ -1,0 +1,67 @@
+import { $state, $effect } from 'aether'
+import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
+import { DocPage, H1, H2, P } from '../components/DocPage.jsx'
+import { colors, fonts } from '../styles.js'
+
+export function ApiEffect() {
+  let ticks = $state(0)
+
+  $effect(() => {
+    const timer = setInterval(() => ticks++, 1000)
+    return () => clearInterval(timer)
+  })
+
+  return (
+    <DocPage>
+      <H1>$effect</H1>
+      <P>Runs a side effect that automatically re-executes when its dependencies change. Cleanup functions are called on re-run and component unmount.</P>
+
+      <H2>Syntax</H2>
+      <CodeBlock code={`$effect(() => {
+  // side effect code
+  return () => { /* cleanup */ }
+})`} />
+
+      <H2>Auto-tracking</H2>
+      <P>Dependencies are tracked automatically \u2014 no dependency array needed.</P>
+      <CodeBlock code={`let query = $state('')
+
+$effect(() => {
+  fetch(\`/api/search?q=\${query}\`)
+    .then(r => r.json())
+    .then(data => results = data)
+})`} />
+
+      <H2>Cleanup</H2>
+      <P>Return a cleanup function from the effect. It runs before re-execution and on unmount.</P>
+      <CodeBlock code={`$effect(() => {
+  const ws = new WebSocket(url)
+  ws.onmessage = (e) => messages = [...messages, e.data]
+  return () => ws.close()
+})`} />
+
+      <H2>Live Demo</H2>
+      <div style={`
+        margin: 1.25rem 0; padding: 2rem; text-align: center;
+        border: 1px solid ${colors.border}; border-radius: 20px;
+        background: ${colors.bgSurface};
+        box-shadow: 4px 4px 0 ${colors.shadow};
+      `}>
+        <div style={`font-size: 0.75rem; font-weight: 600; color: ${colors.textDim}; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem`}>Timer via $effect</div>
+        <div style={`font-family: ${fonts.display}; font-size: 3.5rem; font-weight: 700; color: ${colors.accent}; font-family: ${fonts.mono}`}>{ticks}</div>
+        <div style={`font-size: 0.75rem; color: ${colors.textDim}; margin-top: 0.5rem`}>seconds since page load</div>
+      </div>
+
+      <H2>Compilation</H2>
+      <CodeBlock code={`// Source
+$effect(() => {
+  document.title = \`Count: \${count}\`
+})
+
+// Compiled output
+__effect(() => {
+  document.title = \`Count: \${count.value}\`
+})`} title="Before \u2192 After" />
+    </DocPage>
+  )
+}

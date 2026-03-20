@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Aether - Compile-time Reactive Framework" />
+  <title>Aether - Compile-time Reactive Framework</title>
+  <link rel="icon" href="/aether/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    /* ===== Light Theme (Warm Editorial) ===== */
+    [data-theme="light"] {
+      --c-bg: #f5f0e8;
+      --c-bg-surface: #faf7f2;
+      --c-bg-card: #ebe4d8;
+      --c-bg-hover: #e5ddd0;
+      --c-border: #d4cfc4;
+      --c-border-light: #c8c2b5;
+      --c-text: #1a1612;
+      --c-text-muted: #4a453d;
+      --c-text-dim: #7a756d;
+      --c-accent: #c45d35;
+      --c-accent-hover: #b04e2a;
+      --c-accent-dim: rgba(196, 93, 53, 0.08);
+      --c-accent-warm: #e8845f;
+      --c-accent-muted: #d4a574;
+      --c-code-bg: #faf7f2;
+      --c-code-text: #1a1612;
+      --c-nav-bg: rgba(250, 247, 242, 0.92);
+      --c-active-bg: rgba(26, 22, 18, 0.04);
+      --c-selection: rgba(196, 93, 53, 0.15);
+      --c-scrollbar: #c8c2b5;
+      --c-strong: #1a1612;
+      --c-shadow: rgba(26, 22, 18, 0.06);
+      --c-shadow-accent: rgba(196, 93, 53, 0.1);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-sans: 'DM Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* ===== Dark Theme ===== */
+    [data-theme="dark"] {
+      --c-bg: #1a1612;
+      --c-bg-surface: #231f1a;
+      --c-bg-card: #2a2520;
+      --c-bg-hover: #332e28;
+      --c-border: #3d372f;
+      --c-border-light: #4a453d;
+      --c-text: #f5f0e8;
+      --c-text-muted: #b5afa5;
+      --c-text-dim: #7a756d;
+      --c-accent: #e8845f;
+      --c-accent-hover: #f09575;
+      --c-accent-dim: rgba(232, 132, 95, 0.1);
+      --c-accent-warm: #e8845f;
+      --c-accent-muted: #7a5540;
+      --c-code-bg: #231f1a;
+      --c-code-text: #e5ddd0;
+      --c-nav-bg: rgba(26, 22, 18, 0.92);
+      --c-active-bg: rgba(245, 240, 232, 0.05);
+      --c-selection: rgba(232, 132, 95, 0.25);
+      --c-scrollbar: #4a453d;
+      --c-strong: #f5f0e8;
+      --c-shadow: rgba(0, 0, 0, 0.2);
+      --c-shadow-accent: rgba(232, 132, 95, 0.08);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-sans: 'DM Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: var(--c-bg);
+      color: var(--c-text);
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Film grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    #app { min-height: 100vh; position: relative; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--c-scrollbar); border-radius: 3px; }
+    ::selection { background: var(--c-selection); }
+    a { color: inherit; }
+    button { font-family: var(--font-sans); }
+    strong { color: var(--c-strong); font-weight: 600; }
+  </style>
+  <script>
+    (function() {
+      var t = localStorage.getItem('aether-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

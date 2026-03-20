@@ -1,0 +1,89 @@
+import { $state } from 'aether'
+import { colors, fonts, toggleTheme, getTheme } from '../styles.js'
+
+export function Navbar({ onNavigate, currentRoute }) {
+  let theme = $state(getTheme())
+
+  const navLinks = [
+    { label: 'Guide', path: '/guide/getting-started' },
+    { label: 'API', path: '/api/state' },
+    { label: 'Architecture', path: '/architecture' },
+  ]
+
+  const isActive = (path) => {
+    if (path === '/architecture') return currentRoute === '/architecture'
+    return currentRoute.startsWith(path.split('/').slice(0, 3).join('/'))
+  }
+
+  const handleToggle = () => {
+    theme = toggleTheme()
+  }
+
+  return (
+    <header style={`
+      position: sticky; top: 0; z-index: 100;
+      background: ${colors.navBg};
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid ${colors.border};
+      height: 60px;
+    `}>
+      <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; height: 100%; display: flex; align-items: center; justify-content: space-between">
+        <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; text-decoration: none"
+             onClick={() => onNavigate('/')}>
+          <div style={`
+            width: 40px; height: 40px;
+            background: ${colors.text}; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: ${fonts.display}; font-weight: 700; font-size: 1.25rem;
+            color: ${colors.bg};
+            transform: rotate(-3deg);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+          `}>
+            \u00C6
+          </div>
+          <span style={`font-size: 1.15rem; font-weight: 600; color: ${colors.text}; letter-spacing: -0.02em`}>
+            Aether
+          </span>
+        </div>
+
+        <nav style="display: flex; align-items: center; gap: 1.75rem">
+          {navLinks.map(link => (
+            <a onClick={() => onNavigate(link.path)}
+               style={`
+                 font-size: 0.9rem; font-weight: 500; cursor: pointer;
+                 text-decoration: none; transition: color 0.2s;
+                 color: ${isActive(link.path) ? colors.text : colors.textMuted};
+                 border-bottom: 2px solid ${isActive(link.path) ? colors.accent : 'transparent'};
+                 padding-bottom: 2px;
+               `}>
+              {link.label}
+            </a>
+          ))}
+
+          <button onClick={handleToggle}
+                  style={`
+                    width: 34px; height: 34px; border-radius: 8px;
+                    border: 1px solid ${colors.border};
+                    background: ${colors.bgSurface}; cursor: pointer;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 0.85rem; line-height: 1;
+                    transition: all 0.2s;
+                  `}>
+            {theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19'}
+          </button>
+
+          <a href="https://github.com/zelixag/aether"
+             target="_blank"
+             style={`
+               background: ${colors.accent}; color: white;
+               padding: 0.375rem 0.875rem; border-radius: 6px;
+               font-size: 0.75rem; font-weight: 600;
+               text-decoration: none; letter-spacing: 0.02em;
+             `}>
+            GitHub
+          </a>
+        </nav>
+      </div>
+    </header>
+  )
+}
