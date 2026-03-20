@@ -74,7 +74,7 @@ export {
   mount, __createElement, __createText, __setAttr,
   __bindText, __bindAttr, __conditional, __list,
   __createComponent, __spreadAttrs, ComponentContext,
-  __hmrApply
+  __hmrApply, __child, __bindChild
 } from './dom.ts';
 
 // 内置路由

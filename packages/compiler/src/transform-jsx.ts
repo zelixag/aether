@@ -253,19 +253,17 @@ function buildChild(child: t.Node, parentIdentifier: t.Identifier, state: StateW
     if (t.isJSXEmptyExpression(expr)) return statements;
 
     if (isStaticExpression(expr, state, t)) {
-      // 静态表达式 → 直接文本节点
+      // 静态表达式 → __child（自动处理文本和 DOM 节点）
       statements.push(
         t.expressionStatement(
-          t.callExpression(
-            t.memberExpression(t.cloneNode(parentIdentifier), t.identifier('appendChild')),
-            [t.callExpression(t.identifier('__createText'), [
-              t.callExpression(t.identifier('String'), [expr])
-            ])]
-          )
+          t.callExpression(t.identifier('__child'), [
+            t.cloneNode(parentIdentifier),
+            expr
+          ])
         )
       );
-    } else {
-      // 响应式表达式 → __bindText
+    } else if (isPureTextExpression(expr, state, t)) {
+      // 纯文本响应式表达式（如 count、`${count} items`）→ __bindText（更高效）
       const textId = (state.aether._elCounter = (state.aether._elCounter || 0) + 1);
       const textName = `__t${textId}`;
       const textIdentifier = t.identifier(textName);
@@ -288,6 +286,16 @@ function buildChild(child: t.Node, parentIdentifier: t.Identifier, state: StateW
             t.memberExpression(t.cloneNode(parentIdentifier), t.identifier('appendChild')),
             [t.cloneNode(textIdentifier)]
           )
+        )
+      );
+    } else {
+      // 可能返回 DOM 节点的响应式表达式 → __bindChild（支持文本和节点混合）
+      statements.push(
+        t.expressionStatement(
+          t.callExpression(t.identifier('__bindChild'), [
+            t.cloneNode(parentIdentifier),
+            t.arrowFunctionExpression([], expr)
+          ])
         )
       );
     }
@@ -430,5 +438,30 @@ function isStaticExpression(expr: t.Expression, state: StateWithAether, t: typeo
   }
 
   // 默认为动态
+  return false;
+}
+
+// 判断表达式是否一定返回文本值（不可能是 DOM 节点）
+// 用于选择 __bindText（高效）vs __bindChild（通用）
+function isPureTextExpression(expr: t.Expression, state: StateWithAether, t: typeof import('@babel/types')): boolean {
+  // 单个状态/派生变量引用 → 通常是文本值
+  if (t.isIdentifier(expr)) {
+    const name = expr.name;
+    if (state.aether.stateVars.has(name) || state.aether.derivedVars.has(name)) {
+      return true;
+    }
+    return false;
+  }
+
+  // 模板字符串 → 一定是文本
+  if (t.isTemplateLiteral(expr)) return true;
+
+  // 二元表达式（如 count + 1, "hello" + name）→ 一定是文本
+  if (t.isBinaryExpression(expr)) return true;
+
+  // 字符串/数字字面量 → 文本
+  if (t.isStringLiteral(expr) || t.isNumericLiteral(expr)) return true;
+
+  // 函数调用、条件表达式、逻辑表达式 → 可能返回 DOM 节点
   return false;
 }

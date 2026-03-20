@@ -345,6 +345,8 @@ function rewriteImports(programPath: NodePath<t.Program>, state: PluginState, t:
     runtimeImports.add('__conditional');
     runtimeImports.add('__list');
     runtimeImports.add('__spreadAttrs');
+    runtimeImports.add('__child');
+    runtimeImports.add('__bindChild');
   }
 
   // 保留非宏的导入（如 mount）
