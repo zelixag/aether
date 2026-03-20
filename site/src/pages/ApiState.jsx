@@ -1,7 +1,7 @@
 import { $state } from 'aether'
 import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
 import { DocPage, H1, H2, P, Note } from '../components/DocPage.jsx'
-import { colors } from '../styles.js'
+import { colors, fonts } from '../styles.js'
 
 export function ApiState() {
   let demo = $state(0)
@@ -34,12 +34,17 @@ let items = $state([1, 2, 3])
 items = [...items, 4]  // triggers update`} />
 
       <H2>Live Demo</H2>
-      <div style={`margin: 1rem 0; padding: 1.5rem; border: 1px solid ${colors.border}; border-radius: 8px; background: ${colors.codeBg}; text-align: center`}>
-        <div style={`font-size: 2rem; font-weight: 700; color: ${colors.accent}; margin-bottom: 1rem`}>{demo}</div>
-        <div style="display: flex; gap: 0.5rem; justify-content: center">
-          <button onClick={() => demo--} style={`padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid ${colors.border}; background: transparent; color: ${colors.text}; cursor: pointer`}>-1</button>
-          <button onClick={() => demo = 0} style={`padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid ${colors.border}; background: transparent; color: ${colors.text}; cursor: pointer`}>Reset</button>
-          <button onClick={() => demo++} style={`padding: 0.4rem 1rem; border-radius: 6px; border: none; background: ${colors.accent}; color: white; cursor: pointer`}>+1</button>
+      <div style={`
+        margin: 1.25rem 0; padding: 2rem; text-align: center;
+        border: 1px solid ${colors.border}; border-radius: 20px;
+        background: ${colors.bgSurface};
+        box-shadow: 4px 4px 0 ${colors.shadow};
+      `}>
+        <div style={`font-family: ${fonts.display}; font-size: 3rem; font-weight: 700; color: ${colors.text}; margin-bottom: 0.75rem`}>{demo}</div>
+        <div style="display: flex; gap: 0.625rem; justify-content: center">
+          <button onClick={() => demo--} style={`padding: 0.5rem 1.125rem; border-radius: 8px; border: 2px solid ${colors.text}; background: ${colors.bgSurface}; color: ${colors.text}; cursor: pointer; font-weight: 600; font-family: inherit`}>-1</button>
+          <button onClick={() => demo = 0} style={`padding: 0.5rem 1.125rem; border-radius: 8px; border: 2px solid transparent; background: transparent; color: ${colors.textMuted}; cursor: pointer; font-family: inherit`}>Reset</button>
+          <button onClick={() => demo++} style={`padding: 0.5rem 1.125rem; border-radius: 8px; border: 2px solid ${colors.accent}; background: ${colors.accent}; color: white; cursor: pointer; font-weight: 600; font-family: inherit; box-shadow: 3px 3px 0 ${colors.accentMuted}`}>+1</button>
         </div>
       </div>
 
@@ -52,7 +57,7 @@ count++
 // Compiled output
 let count = __signal(0)
 console.log(count.value)
-count.value++`} title="Before → After" />
+count.value++`} title="Before \u2192 After" />
 
       <Note>
         <strong>Important:</strong> <InlineCode>$state</InlineCode> must be used with <InlineCode>let</InlineCode>, not <InlineCode>const</InlineCode>, since the variable will be reassigned.

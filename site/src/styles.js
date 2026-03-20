@@ -1,5 +1,4 @@
-// Design tokens — all values reference CSS custom properties
-// Theme switching works by toggling [data-theme] on <html>
+// Design tokens — CSS custom properties (set in index.html)
 export const colors = {
   bg: 'var(--c-bg)',
   bgSurface: 'var(--c-bg-surface)',
@@ -13,21 +12,25 @@ export const colors = {
   accent: 'var(--c-accent)',
   accentHover: 'var(--c-accent-hover)',
   accentDim: 'var(--c-accent-dim)',
+  accentWarm: 'var(--c-accent-warm)',
+  accentMuted: 'var(--c-accent-muted)',
   codeBg: 'var(--c-code-bg)',
   codeText: 'var(--c-code-text)',
   navBg: 'var(--c-nav-bg)',
   activeBg: 'var(--c-active-bg)',
+  shadow: 'var(--c-shadow)',
+  shadowAccent: 'var(--c-shadow-accent)',
 }
 
 export const fonts = {
-  sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-  mono: "'SF Mono', 'Fira Code', 'Cascadia Code', monospace",
+  display: 'var(--font-display)',
+  sans: 'var(--font-sans)',
+  mono: 'var(--font-mono)',
 }
 
-// Theme management
 export function getTheme() {
-  if (typeof window === 'undefined') return 'dark'
-  return localStorage.getItem('aether-theme') || 'dark'
+  if (typeof window === 'undefined') return 'light'
+  return localStorage.getItem('aether-theme') || 'light'
 }
 
 export function setTheme(theme) {
@@ -36,12 +39,11 @@ export function setTheme(theme) {
 }
 
 export function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'dark'
+  const current = document.documentElement.getAttribute('data-theme') || 'light'
   setTheme(current === 'dark' ? 'light' : 'dark')
   return current === 'dark' ? 'light' : 'dark'
 }
 
-// Initialize theme on load
 export function initTheme() {
   setTheme(getTheme())
 }
