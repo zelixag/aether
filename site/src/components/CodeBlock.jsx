@@ -5,22 +5,24 @@ export function CodeBlock({ code, lang = 'jsx', title = '' }) {
     <div style={`
       margin: 1rem 0; border-radius: 8px; overflow: hidden;
       border: 1px solid ${colors.border};
-      background: ${colors.bgSurface};
+      background: #111;
     `}>
       {title ? (
         <div style={`
-          padding: 0.5rem 1rem;
-          font-size: 0.75rem; font-weight: 500;
+          padding: 0.4rem 1rem;
+          font-size: 0.725rem; font-weight: 500;
           color: ${colors.textDim};
           border-bottom: 1px solid ${colors.border};
           font-family: ${fonts.mono};
+          background: rgba(255,255,255,0.02);
         `}>{title}</div>
       ) : null}
       <pre style={`
-        padding: 1rem 1.25rem; margin: 0;
-        overflow-x: auto; font-size: 0.85rem; line-height: 1.6;
+        padding: 0.875rem 1.125rem; margin: 0;
+        overflow-x: auto; font-size: 0.8125rem; line-height: 1.65;
         font-family: ${fonts.mono};
-        color: ${colors.text};
+        color: #c9d1d9;
+        -webkit-overflow-scrolling: touch;
       `}><code>{code}</code></pre>
     </div>
   )
@@ -29,11 +31,11 @@ export function CodeBlock({ code, lang = 'jsx', title = '' }) {
 export function InlineCode({ children }) {
   return (
     <code style={`
-      padding: 0.15rem 0.4rem; border-radius: 4px;
-      background: ${colors.bgCard};
+      padding: 0.125rem 0.375rem; border-radius: 4px;
+      background: rgba(255,255,255,0.06);
       border: 1px solid ${colors.border};
       font-family: ${fonts.mono};
-      font-size: 0.85em; color: ${colors.accent};
+      font-size: 0.825em; color: ${colors.accent};
     `}>{children}</code>
   )
 }
