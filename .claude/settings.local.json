@@ -10,7 +10,9 @@
       "Bash(taskkill:*)",
       "Bash(npm whoami:*)",
       "Bash(npm view:*)",
-      "Bash(npm publish:*)"
+      "Bash(npm publish:*)",
+      "Bash(mkdir:*)",
+      "Bash(netstat:*)"
     ]
   }
 }
