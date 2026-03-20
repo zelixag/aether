@@ -1,0 +1,19 @@
+{
+  "name": "aether-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "aether": "workspace:@zhenglinxiong/aether@*",
+    "aether-compiler": "workspace:@zhenglinxiong/aether-compiler@*"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0",
+    "@babel/core": "^7.24.0",
+    "@babel/plugin-syntax-jsx": "^7.24.0"
+  }
+}

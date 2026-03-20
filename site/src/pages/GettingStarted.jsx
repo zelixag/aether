@@ -1,0 +1,73 @@
+import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
+import { DocPage, H1, H2, H3, P, Ul, Li } from '../components/DocPage.jsx'
+
+export function GettingStarted() {
+  return (
+    <DocPage>
+      <H1>Getting Started</H1>
+      <P>Aether is a compile-time reactive framework. You write natural JavaScript with macros like <InlineCode>$state</InlineCode>, and the compiler transforms them into optimized DOM operations.</P>
+
+      <H2>Installation</H2>
+      <CodeBlock lang="bash" code={`npm create aether-app my-app
+cd my-app
+npm install
+npm run dev`} title="Terminal" />
+
+      <P>Or add to an existing Vite project:</P>
+      <CodeBlock lang="bash" code={`npm install aether @zhenglinxiong/aether-compiler`} />
+
+      <H2>Configure Vite</H2>
+      <CodeBlock code={`// vite.config.js
+import { aetherVitePlugin } from '@zhenglinxiong/aether-compiler'
+
+export default {
+  plugins: [aetherVitePlugin()]
+}`} title="vite.config.js" />
+
+      <H2>Your First Component</H2>
+      <CodeBlock code={`import { $state, $derived, $effect, mount } from 'aether'
+
+function App() {
+  // Reactive state — just a variable
+  let count = $state(0)
+
+  // Derived value — auto-cached
+  let double = $derived(() => count * 2)
+
+  // Side effect — auto-cleanup
+  $effect(() => {
+    document.title = \`Count: \${count}\`
+  })
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <p>Double: {double}</p>
+      <button onClick={() => count++}>Increment</button>
+    </div>
+  )
+}
+
+mount(App, '#app')`} title="src/main.jsx" />
+
+      <H2>What Happens at Compile Time</H2>
+      <P>The compiler transforms your code in three steps:</P>
+      <Ul>
+        <Li><strong>Macro identification</strong> — finds all <InlineCode>$state</InlineCode>, <InlineCode>$derived</InlineCode>, <InlineCode>$effect</InlineCode> imports from 'aether'</Li>
+        <Li><strong>Variable rewriting</strong> — replaces reads with <InlineCode>.value</InlineCode> and writes with <InlineCode>.value = ...</InlineCode></Li>
+        <Li><strong>JSX compilation</strong> — converts JSX into direct DOM creation with fine-grained update bindings</Li>
+      </Ul>
+
+      <CodeBlock code={`// Before (your code)
+let count = $state(0)
+count++
+
+// After (compiler output)
+let count = __signal(0)
+count.value++`} title="Compilation example" />
+
+      <H2>Next Steps</H2>
+      <P>Learn about the core reactive primitives in the API reference, or dive into the architecture to understand how the compiler works.</P>
+    </DocPage>
+  )
+}
