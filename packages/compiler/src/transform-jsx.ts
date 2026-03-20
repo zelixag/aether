@@ -259,7 +259,7 @@ function buildChild(child: t.Node, parentIdentifier: t.Identifier, state: StateW
           t.callExpression(
             t.memberExpression(t.cloneNode(parentIdentifier), t.identifier('appendChild')),
             [t.callExpression(t.identifier('__createText'), [
-              t.callExpression(t.memberExpression(t.identifier('String'), t.identifier('')), [expr])
+              t.callExpression(t.identifier('String'), [expr])
             ])]
           )
         )

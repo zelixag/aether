@@ -10,7 +10,20 @@
       "Bash(taskkill:*)",
       "Bash(npm whoami:*)",
       "Bash(npm view:*)",
-      "Bash(npm publish:*)"
+      "Bash(npm publish:*)",
+      "Bash(mv Layout.ts Layout.jsx)",
+      "Bash(mv Navbar.ts Navbar.jsx)",
+      "Bash(mv Sidebar.ts Sidebar.jsx)",
+      "Bash(mv CodeBlock.ts CodeBlock.jsx)",
+      "Bash(mv TableOfContents.ts TableOfContents.jsx)",
+      "Bash(mv index.ts index.jsx)",
+      "Bash(mv guide/getting-started.ts guide/getting-started.jsx)",
+      "Bash(mv api/$state.ts api/$state.jsx)",
+      "Bash(cd:*)",
+      "Bash(ls -la C:/Users/Administrator/workspace/aether/*.json)",
+      "Bash(netstat -ano)",
+      "Bash(ls:*)",
+      "Bash(node test-bug.js)"
     ]
   }
 }

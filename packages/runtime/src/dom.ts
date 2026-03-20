@@ -4,7 +4,10 @@
 import { __effect, Effect } from './signal.ts';
 
 // DEV 模式性能标记
-const __DEV__: boolean = typeof process !== 'undefined' && process.env.NODE_ENV !== 'production';
+// Use a function to avoid minifier bug that transforms 'undefined' to template literal
+const __DEV__: boolean = (() => {
+  try { return process?.env?.NODE_ENV !== 'production'; } catch { return false; }
+})();
 
 function __mark(label: string): void {
   if (__DEV__ && performance) {
