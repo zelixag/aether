@@ -1,9 +1,8 @@
-import { $state } from 'aether'
-import { CodeBlock } from '../components/CodeBlock.jsx'
+import { CodeBlock } from '../components/CodeBlock.ae'
 import { colors, fonts } from '../styles.js'
 
 export function Home({ onNavigate }) {
-  let count = $state(0)
+  let count = 0
 
   const heroCode = `import { $state, $derived, mount } from 'aether'
 
@@ -179,7 +178,7 @@ count.value++`
       </section>
 
       <section style="max-width: 680px; margin: 0 auto; padding: 0 2rem 4rem">
-        <CodeBlock code={heroCode} title="Counter.jsx" />
+        <CodeBlock code={heroCode} title="Counter.ae" />
       </section>
 
       <footer style={`

@@ -1,8 +1,7 @@
-import { $state } from 'aether'
 import { colors, fonts, toggleTheme, getTheme } from '../styles.js'
 
 export function Navbar({ onNavigate, currentRoute }) {
-  let theme = $state(getTheme())
+  let theme = getTheme()
 
   const navLinks = [
     { label: 'Guide', path: '/guide/getting-started' },

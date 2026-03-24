@@ -1,10 +1,9 @@
-import { $state, $effect } from 'aether'
-import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
-import { DocPage, H1, H2, P } from '../components/DocPage.jsx'
+import { CodeBlock, InlineCode } from '../components/CodeBlock.ae'
+import { DocPage, H1, H2, P } from '../components/DocPage.ae'
 import { colors, fonts } from '../styles.js'
 
 export function ApiEffect() {
-  let ticks = $state(0)
+  let ticks = 0
 
   $effect(() => {
     const timer = setInterval(() => ticks++, 1000)

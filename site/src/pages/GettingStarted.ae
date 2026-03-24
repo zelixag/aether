@@ -1,5 +1,5 @@
-import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
-import { DocPage, H1, H2, H3, P, Ul, Li } from '../components/DocPage.jsx'
+import { CodeBlock, InlineCode } from '../components/CodeBlock.ae'
+import { DocPage, H1, H2, H3, P, Ul, Li } from '../components/DocPage.ae'
 
 export function GettingStarted() {
   return (
@@ -48,7 +48,7 @@ function App() {
   )
 }
 
-mount(App, '#app')`} title="src/main.jsx" />
+mount(App, '#app')`} title="src/main.ae" />
 
       <H2>What Happens at Compile Time</H2>
       <P>The compiler transforms your code in three steps:</P>

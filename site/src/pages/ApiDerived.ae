@@ -1,12 +1,11 @@
-import { $state, $derived } from 'aether'
-import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
-import { DocPage, H1, H2, P, Note } from '../components/DocPage.jsx'
+import { CodeBlock, InlineCode } from '../components/CodeBlock.ae'
+import { DocPage, H1, H2, P, Note } from '../components/DocPage.ae'
 import { colors, fonts } from '../styles.js'
 
 export function ApiDerived() {
-  let a = $state(3)
-  let b = $state(4)
-  let sum = $derived(() => a + b)
+  let a = 3
+  let b = 4
+  const sum = a + b
 
   return (
     <DocPage>

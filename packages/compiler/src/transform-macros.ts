@@ -1,5 +1,6 @@
 // Aether Compiler - 宏转换
 // 处理 $state/$derived/$effect/$store/$async 的识别和代码转换
+// 支持 .ae 文件的隐式响应式：let → $state, const + reactive dep → $derived
 
 import type { NodePath } from '@babel/traverse';
 import type * as t from '@babel/types';
@@ -23,6 +24,7 @@ interface AetherState {
   _elCounter?: number;
   _inlinedDerived?: Set<string>;
   _jsxValidationErrors?: Array<{ type: string; message: string; loc: unknown }>;
+  _implicitMode?: boolean; // .ae 文件隐式响应式模式
 }
 
 interface StateWithAether extends Record<string, unknown> {
@@ -237,5 +239,132 @@ function shouldSkipIdentifier(path: NodePath<t.Identifier>, t: typeof import('@b
   // 10. 类型注解（TypeScript）
   if (parentPath.isTSTypeReference?.()) return true;
 
+  return false;
+}
+
+// ============================================
+// .ae 隐式响应式转换
+// 规则：
+//   - 所有 let 声明 → $state (自动转为 Signal)
+//   - const 声明 + 初始化表达式引用了 reactive 变量 → $derived
+//   - $effect 保留显式声明
+// ============================================
+
+/**
+ * 隐式模式下处理变量声明
+ * 在 .ae 文件中：
+ *   let count = 0         → const count = __signal(0)
+ *   const double = count * 2  → const double = __derived(() => count * 2)  (如果引用了 reactive 变量)
+ */
+export function implicitVariableDeclaration(
+  path: NodePath<t.VariableDeclaration>,
+  state: StateWithAether,
+  t: typeof import('@babel/types')
+): void {
+  const declarations = path.node.declarations;
+
+  for (const decl of declarations) {
+    if (!t.isIdentifier(decl.id)) continue;
+    const varName = decl.id.name;
+
+    // 跳过没有初始值的声明
+    if (!decl.init) continue;
+
+    // 如果是显式的宏调用（$state/$derived/$store/$async），走原来的逻辑
+    if (t.isCallExpression(decl.init) && t.isIdentifier(decl.init.callee)) {
+      const callee = decl.init.callee.name;
+      if (['$state', '$derived', '$effect', '$store', '$async',
+           state.aether._import_$state, state.aether._import_$derived,
+           state.aether._import_$store, state.aether._import_$async].includes(callee)) {
+        return; // 让原来的 transformMacros.variableDeclaration 处理
+      }
+    }
+
+    // 跳过函数声明（const handler = () => {} 不是 derived）
+    if (t.isArrowFunctionExpression(decl.init) || t.isFunctionExpression(decl.init)) continue;
+
+    // 跳过 for 循环中的 let
+    if (isInForStatement(path)) continue;
+
+    if (path.node.kind === 'let') {
+      // ===== let → $state =====
+      // let count = 0  →  const count = __signal(0)
+      state.aether.stateVars.set(varName, path as unknown as NodePath<t.VariableDeclarator>);
+      decl.init = t.callExpression(t.identifier('__signal'), [decl.init]);
+      path.node.kind = 'const';
+    } else if (path.node.kind === 'const') {
+      // ===== const + reactive dep → $derived =====
+      // const double = count * 2  →  const double = __derived(() => count * 2)
+      // 只在初始化表达式引用了已知的 reactive 变量时才转换
+      if (exprReferencesReactive(decl.init, state.aether.stateVars, state.aether.derivedVars, t)) {
+        state.aether.derivedVars.set(varName, path as unknown as NodePath<t.VariableDeclarator>);
+        decl.init = t.callExpression(
+          t.identifier('__derived'),
+          [t.arrowFunctionExpression([], decl.init)]
+        );
+      }
+    }
+  }
+}
+
+/**
+ * 检查表达式是否引用了 reactive 变量（stateVars 或 derivedVars）
+ */
+function exprReferencesReactive(
+  node: t.Node,
+  stateVars: Map<string, unknown>,
+  derivedVars: Map<string, unknown>,
+  t: typeof import('@babel/types')
+): boolean {
+  if (t.isIdentifier(node)) {
+    return stateVars.has(node.name) || derivedVars.has(node.name);
+  }
+  if (t.isBinaryExpression(node) || t.isLogicalExpression(node)) {
+    return exprReferencesReactive(node.left, stateVars, derivedVars, t) ||
+           exprReferencesReactive(node.right, stateVars, derivedVars, t);
+  }
+  if (t.isUnaryExpression(node)) {
+    return exprReferencesReactive(node.argument, stateVars, derivedVars, t);
+  }
+  if (t.isConditionalExpression(node)) {
+    return exprReferencesReactive(node.test, stateVars, derivedVars, t) ||
+           exprReferencesReactive(node.consequent, stateVars, derivedVars, t) ||
+           exprReferencesReactive(node.alternate, stateVars, derivedVars, t);
+  }
+  if (t.isTemplateLiteral(node)) {
+    return node.expressions.some(expr =>
+      exprReferencesReactive(expr as t.Node, stateVars, derivedVars, t)
+    );
+  }
+  if (t.isCallExpression(node)) {
+    return node.arguments.some(arg =>
+      exprReferencesReactive(arg as t.Node, stateVars, derivedVars, t)
+    );
+  }
+  if (t.isMemberExpression(node)) {
+    return exprReferencesReactive(node.object, stateVars, derivedVars, t);
+  }
+  if (t.isArrayExpression(node)) {
+    return node.elements.some(el =>
+      el ? exprReferencesReactive(el as t.Node, stateVars, derivedVars, t) : false
+    );
+  }
+  if (t.isObjectExpression(node)) {
+    return node.properties.some(prop =>
+      t.isObjectProperty(prop) ? exprReferencesReactive(prop.value as t.Node, stateVars, derivedVars, t) : false
+    );
+  }
+  return false;
+}
+
+/**
+ * 检查是否在 for/for-in/for-of 语句的 init 部分
+ */
+function isInForStatement(path: NodePath<t.Node>): boolean {
+  const parent = path.parentPath;
+  if (!parent) return false;
+  if (parent.isForStatement() && path.key === 'init') return true;
+  if (parent.isForInStatement() && path.key === 'left') return true;
+  if (parent.isForOfStatement() && path.key === 'left') return true;
   return false;
 }

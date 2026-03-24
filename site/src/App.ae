@@ -1,16 +1,15 @@
-import { $state, $derived } from 'aether'
-import { Navbar } from './components/Navbar.jsx'
-import { Sidebar } from './components/Sidebar.jsx'
-import { Home } from './pages/Home.jsx'
-import { GettingStarted } from './pages/GettingStarted.jsx'
-import { Concepts } from './pages/Concepts.jsx'
-import { ApiState } from './pages/ApiState.jsx'
-import { ApiDerived } from './pages/ApiDerived.jsx'
-import { ApiEffect } from './pages/ApiEffect.jsx'
-import { ApiStore } from './pages/ApiStore.jsx'
-import { ApiMount } from './pages/ApiMount.jsx'
-import { ApiRouter } from './pages/ApiRouter.jsx'
-import { Architecture } from './pages/Architecture.jsx'
+import { Navbar } from './components/Navbar.ae'
+import { Sidebar } from './components/Sidebar.ae'
+import { Home } from './pages/Home.ae'
+import { GettingStarted } from './pages/GettingStarted.ae'
+import { Concepts } from './pages/Concepts.ae'
+import { ApiState } from './pages/ApiState.ae'
+import { ApiDerived } from './pages/ApiDerived.ae'
+import { ApiEffect } from './pages/ApiEffect.ae'
+import { ApiStore } from './pages/ApiStore.ae'
+import { ApiMount } from './pages/ApiMount.ae'
+import { ApiRouter } from './pages/ApiRouter.ae'
+import { Architecture } from './pages/Architecture.ae'
 import { colors, initTheme } from './styles.js'
 
 initTheme()
@@ -21,14 +20,14 @@ function getRoute() {
 }
 
 export function App() {
-  let route = $state(getRoute())
+  let route = getRoute()
 
   window.addEventListener('hashchange', () => {
     route = getRoute()
     window.scrollTo(0, 0)
   })
 
-  let isHome = $derived(() => route === '/')
+  const isHome = route === '/'
 
   const navigateTo = (path) => {
     window.location.hash = path

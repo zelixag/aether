@@ -7,7 +7,7 @@ import type { NodePath } from '@babel/traverse';
 import type * as t from '@babel/types';
 import type { types as BabelTypes } from '@babel/core';
 
-import { transformMacros } from './transform-macros.ts';
+import { transformMacros, implicitVariableDeclaration } from './transform-macros.ts';
 import { transformJSX } from './transform-jsx.ts';
 import { transformStyle } from './transform-style.ts';
 import { transformSSR } from './transform-ssr.ts';
@@ -50,6 +50,7 @@ interface BabelPluginOptions {
   verbose?: boolean;
   disableOptimizations?: boolean;
   ssr?: boolean;  // SSR 编译模式
+  implicit?: boolean; // .ae 文件隐式响应式模式
 }
 
 // SSR 状态接口
@@ -65,7 +66,7 @@ interface SSRState {
 }
 
 function aetherPlugin({ types: t }: { types: typeof BabelTypes }, options: BabelPluginOptions = {}) {
-  const { isHmrBoundary = false, hmrState = null, ssr = false } = options || {};
+  const { isHmrBoundary = false, hmrState = null, ssr = false, implicit = false } = options || {};
 
   return {
     name: 'aether-compiler',
@@ -79,7 +80,12 @@ function aetherPlugin({ types: t }: { types: typeof BabelTypes }, options: Babel
             effectCalls: [],
             macroImported: false,
             importPath: null,
+            _implicitMode: implicit,
           };
+          // .ae 文件：隐式模式，不需要 import { $state } from 'aether'
+          if (implicit) {
+            state.aether.macroImported = true;
+          }
 
           // 初始化 SSR 状态
           state.ssr = {
@@ -93,6 +99,11 @@ function aetherPlugin({ types: t }: { types: typeof BabelTypes }, options: Babel
           };
         },
         exit(path, state: PluginState) {
+          // .ae 隐式模式：自动注入运行时导入
+          if (state.aether._implicitMode) {
+            injectImplicitImports(path, state, t);
+          }
+
           // 如果有 JSX 但没有 aether import，注入 DOM 运行时导入
           if (!state.aether.macroImported && state.aether._needsDOM) {
             const domImports = [
@@ -196,14 +207,31 @@ function aetherPlugin({ types: t }: { types: typeof BabelTypes }, options: Babel
       },
 
       // 处理变量声明：let count = $state(0)
+      // .ae 隐式模式：let count = 0 → 自动 $state
       VariableDeclaration(path, state: PluginState) {
         if (!state.aether.macroImported) return;
+        // 隐式模式：先尝试隐式转换
+        if (state.aether._implicitMode) {
+          implicitVariableDeclaration(path, state, t);
+        }
+        // 显式宏也继续处理（兼容在 .ae 文件中显式使用 $state 的情况）
         transformMacros.variableDeclaration(path, state, t);
       },
 
       // 处理表达式语句：$effect(() => { ... })
       ExpressionStatement(path, state: PluginState) {
         if (!state.aether.macroImported) return;
+        // .ae 隐式模式：直接识别 $effect/$store/$async，无需 import
+        if (state.aether._implicitMode) {
+          const expr = path.node.expression;
+          if (t.isCallExpression(expr) && t.isIdentifier(expr.callee)) {
+            if (expr.callee.name === '$effect') {
+              expr.callee = t.identifier('__effect');
+              state.aether.effectCalls.push(path as NodePath<t.Expression>);
+              return;
+            }
+          }
+        }
         transformMacros.expressionStatement(path, state, t);
       },
 
@@ -331,6 +359,67 @@ function aetherPlugin({ types: t }: { types: typeof BabelTypes }, options: Babel
 
     }
   };
+}
+
+// .ae 隐式模式：自动注入所需的运行时 import
+function injectImplicitImports(programPath: NodePath<t.Program>, state: PluginState, t: typeof import('@babel/types')) {
+  const { stateVars, derivedVars, effectCalls, importPath } = state.aether;
+  const runtimeImports = new Set<string>();
+
+  // 根据使用情况添加运行时导入
+  if (stateVars.size > 0) runtimeImports.add('__signal');
+  if (derivedVars.size > 0) runtimeImports.add('__derived');
+  if (effectCalls.length > 0) runtimeImports.add('__effect');
+  if (state.aether._hasStore) runtimeImports.add('__store');
+  if (state.aether._hasAsync) runtimeImports.add('__async');
+
+  // DOM 运行时
+  if (state.aether._needsDOM) {
+    for (const name of [
+      '__createElement', '__createText', '__setAttr',
+      '__bindText', '__bindAttr', '__createComponent',
+      '__conditional', '__list', '__spreadAttrs',
+      '__child', '__bindChild'
+    ]) {
+      runtimeImports.add(name);
+    }
+  }
+
+  if (runtimeImports.size === 0) return;
+
+  // 检查是否已有 aether import（用户可能手动 import { mount } from 'aether'）
+  const existingAetherImport = programPath.node.body.find(
+    node => t.isImportDeclaration(node) && node.source.value === 'aether'
+  ) as t.ImportDeclaration | undefined;
+
+  if (existingAetherImport) {
+    // 追加到现有 import
+    for (const name of runtimeImports) {
+      const alreadyImported = existingAetherImport.specifiers.some(
+        s => t.isImportSpecifier(s) && (s.imported as t.Identifier).name === name
+      );
+      if (!alreadyImported) {
+        existingAetherImport.specifiers.push(
+          t.importSpecifier(t.identifier(name), t.identifier(name))
+        );
+      }
+    }
+
+    // 移除宏名称的导入（$state/$derived 等在隐式模式下不需要导入）
+    existingAetherImport.specifiers = existingAetherImport.specifiers.filter(s => {
+      if (!t.isImportSpecifier(s)) return true;
+      const name = (s.imported as t.Identifier).name;
+      return !['$state', '$derived', '$effect', '$store', '$async', '$style'].includes(name);
+    });
+  } else {
+    // 创建新 import
+    const specifiers = [...runtimeImports].map(name =>
+      t.importSpecifier(t.identifier(name), t.identifier(name))
+    );
+    programPath.node.body.unshift(
+      t.importDeclaration(specifiers, t.stringLiteral('aether'))
+    );
+  }
 }
 
 // 重写导入语句
@@ -522,19 +611,33 @@ export function aetherVitePlugin(options: { ssr?: boolean } = {}) {
         oxc: {
           jsx: 'preserve',
         },
+        resolve: {
+          // 让 Vite 识别 .ae 后缀
+          extensions: ['.ae', '.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
+        },
       };
     },
 
+    // 让 Vite 识别 .ae 文件
+    resolveId(source: string, importer: string | undefined) {
+      // 只处理 .ae 后缀的导入
+      if (source.endsWith('.ae')) {
+        return null; // 让 Vite 默认解析，但确保它知道这是有效扩展名
+      }
+    },
+
     async transform(code: string, id: string) {
-      if (!/\.[jt]sx?$/.test(id)) return null;
+      // 支持 .ae (Aether 组件) + .jsx/.tsx/.js/.ts
+      const isAetherFile = /\.ae(\?|$)/.test(id);
+      if (!isAetherFile && !/\.[jt]sx?(\?|$)/.test(id)) return null;
       if (id.includes('node_modules')) return null;
       // 排除 runtime 和 compiler 包本身
       if (id.includes('/packages/runtime/src/') || id.includes('\\packages\\runtime\\src\\')) return null;
       if (id.includes('/packages/compiler/src/') || id.includes('\\packages\\compiler\\src\\')) return null;
-      // 处理所有 .jsx/.tsx 文件（JSX 转换）或包含 aether 导入的文件（宏转换）
-      const isJSX = /\.[jt]sx$/.test(id);
+      // .ae 文件强制处理；其他文件需要有 JSX 或 aether 导入
+      const isJSX = isAetherFile || /\.[jt]sx$/.test(id);
       const hasAetherImport = code.includes('aether');
-      if (!isJSX && !hasAetherImport) return null;
+      if (!isAetherFile && !isJSX && !hasAetherImport) return null;
 
       const babel = await import('@babel/core');
 
@@ -543,10 +646,11 @@ export function aetherVitePlugin(options: { ssr?: boolean } = {}) {
 
       try {
         const result = await babel.transformAsync(code, {
-          filename: id,
+          // .ae 文件当作 JSX 解析
+          filename: isAetherFile ? id.replace(/\.ae$/, '.jsx') : id,
           plugins: [
             ['@babel/plugin-syntax-jsx'],
-            [aetherPlugin, { isHmrBoundary, ssr: ssrMode }],
+            [aetherPlugin, { isHmrBoundary, ssr: ssrMode, implicit: isAetherFile }],
           ],
           sourceMaps: true,
           comments: true,

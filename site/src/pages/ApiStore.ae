@@ -1,5 +1,5 @@
-import { CodeBlock, InlineCode } from '../components/CodeBlock.jsx'
-import { DocPage, H1, H2, P, Note } from '../components/DocPage.jsx'
+import { CodeBlock, InlineCode } from '../components/CodeBlock.ae'
+import { DocPage, H1, H2, P, Note } from '../components/DocPage.ae'
 
 export function ApiStore() {
   return (
@@ -35,7 +35,7 @@ userStore.age = 26        // only age subscribers update`} />
 import { $store } from 'aether'
 export let appStore = $store({ count: 0 })
 
-// ComponentA.jsx
+// ComponentA.ae
 import { appStore } from './store.js'
 function ComponentA() {
   return <button onClick={() => appStore.count++}>
@@ -43,7 +43,7 @@ function ComponentA() {
   </button>
 }
 
-// ComponentB.jsx
+// ComponentB.ae
 import { appStore } from './store.js'
 function ComponentB() {
   return <p>Count: {appStore.count}</p>  // auto-updates
