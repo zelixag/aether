@@ -51,6 +51,14 @@ jobs:
       - name: Build site (Aether-powered)
         run: cd site && pnpm run build
 
+      - name: Build alphabet-adventure example
+        run: cd examples/alphabet-adventure && pnpm run build
+
+      - name: Copy alphabet-adventure into site/dist
+        run: |
+          mkdir -p site/dist/alphabet-adventure
+          cp -r examples/alphabet-adventure/dist/* site/dist/alphabet-adventure/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
