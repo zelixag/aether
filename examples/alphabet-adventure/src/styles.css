@@ -1,0 +1,617 @@
+/* ============================================
+   Aether 字母冒险 — 2.5 岁友好的启蒙游戏样式
+   设计原则：大元素、柔和色、圆润、温暖
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
+  font-family: 'Fredoka', 'Baloo 2', -apple-system, sans-serif;
+  color: #3a2e1f;
+}
+
+:root {
+  --cream:    #fef3e2;
+  --cream-2:  #faead0;
+  --sunny:    #ffc93c;
+  --orange:   #ff8c42;
+  --coral:    #ff6f61;
+  --mint:     #74d3ae;
+  --sky:      #6bb7f0;
+  --lavender: #b39ddb;
+  --ink:      #3a2e1f;
+  --ink-soft: #6b5b4a;
+  --shadow:   rgba(58, 46, 31, 0.15);
+}
+
+body {
+  background: var(--cream);
+  background-image:
+    radial-gradient(circle at 20% 10%, #ffe4b5 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, #ffd3a5 0%, transparent 40%);
+}
+
+#app, .app-root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  animation: screen-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================
+   通用：大按钮 + 返回按钮
+   ============================================ */
+
+.big-button {
+  font-family: inherit;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 1.5rem 3.5rem;
+  border: none;
+  border-radius: 100px;
+  background: var(--coral);
+  color: #fff;
+  cursor: pointer;
+  box-shadow:
+    0 8px 0 #d85548,
+    0 12px 24px var(--shadow);
+  transition: all 0.15s;
+  min-width: 200px;
+  min-height: 80px;
+}
+
+.big-button:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 4px 0 #d85548,
+    0 6px 12px var(--shadow);
+}
+
+.start-button {
+  background: var(--sunny);
+  box-shadow:
+    0 8px 0 #e0a82d,
+    0 12px 24px var(--shadow);
+  color: var(--ink);
+  animation: bounce 2s infinite;
+}
+
+.start-button:active {
+  box-shadow:
+    0 4px 0 #e0a82d,
+    0 6px 12px var(--shadow);
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+.back-button {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 10;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 4px 0 #e8dfd0, 0 6px 12px var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #e8dfd0, 0 3px 6px var(--shadow);
+}
+
+/* ============================================
+   欢迎屏
+   ============================================ */
+
+.welcome-screen {
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.welcome-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bubble {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 3rem;
+  color: #fff;
+  animation: float 6s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+.bubble-1 { top: 12%; left: 10%; background: var(--coral);  animation-delay: 0s; }
+.bubble-2 { top: 20%; right: 12%; background: var(--sky);    animation-delay: 1s; }
+.bubble-3 { bottom: 18%; left: 15%; background: var(--mint);  animation-delay: 2s; }
+.bubble-4 { bottom: 25%; right: 10%; background: var(--lavender); animation-delay: 3s; }
+.bubble-5 { top: 48%; left: 8%; background: var(--sunny);   animation-delay: 1.5s; color: var(--ink); }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-20px) rotate(3deg); }
+}
+
+.welcome-content {
+  text-align: center;
+  z-index: 2;
+}
+
+.welcome-mascot {
+  font-size: 8rem;
+  animation: wiggle 2.5s ease-in-out infinite;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes wiggle {
+  0%, 100%   { transform: rotate(-5deg); }
+  50%        { transform: rotate(5deg); }
+}
+
+.welcome-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 4.5rem;
+  font-weight: 800;
+  color: var(--coral);
+  letter-spacing: -0.02em;
+  text-shadow: 4px 4px 0 rgba(255, 111, 97, 0.2);
+  margin-bottom: 0.25rem;
+}
+
+.welcome-sub {
+  font-size: 1.5rem;
+  color: var(--ink-soft);
+  margin-bottom: 3rem;
+  font-weight: 500;
+}
+
+/* ============================================
+   关卡地图
+   ============================================ */
+
+.map-screen {
+  align-items: center;
+  padding: 5rem 2rem 2rem;
+}
+
+.map-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.level-grid {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 900px;
+}
+
+.level-card {
+  width: 220px;
+  background: #fff;
+  border-radius: 32px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 8px 0 #e8dfd0, 0 14px 28px var(--shadow);
+  transition: transform 0.2s;
+}
+
+.level-card.unlocked:active {
+  transform: translateY(4px) scale(0.98);
+}
+
+.level-card.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.level-num {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 56px;
+  background: var(--coral);
+  color: #fff;
+  border-radius: 50%;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 0 #d85548;
+}
+
+.level-card:nth-child(2) .level-num { background: var(--sky); box-shadow: 0 4px 0 #4a94d1; }
+.level-card:nth-child(3) .level-num { background: var(--mint); box-shadow: 0 4px 0 #52b08c; }
+
+.level-emoji {
+  font-size: 4.5rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.level-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+
+.level-stars {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 2rem;
+}
+
+.star {
+  color: #e5d5b8;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.star.on {
+  color: var(--sunny);
+  text-shadow: 0 2px 4px rgba(255, 201, 60, 0.4);
+}
+
+.level-lock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  opacity: 0.7;
+}
+
+/* ============================================
+   游戏屏通用
+   ============================================ */
+
+.game-screen {
+  padding: 5.5rem 2rem 2rem;
+  align-items: center;
+}
+
+.game-header {
+  position: absolute;
+  top: 1.5rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem 0 7rem;
+}
+
+.game-progress,
+.game-score {
+  background: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 100px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--ink);
+  box-shadow: 0 4px 0 #e8dfd0;
+}
+
+.game-score {
+  color: var(--orange);
+}
+
+.game-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.instruction {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 0.5rem;
+}
+
+/* 第1关：声音按钮 */
+.sound-button {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: none;
+  background: var(--sunny);
+  font-size: 4rem;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #e0a82d, 0 12px 24px var(--shadow);
+  animation: pulse 2s infinite;
+}
+
+.sound-button:active {
+  transform: translateY(4px);
+  box-shadow: 0 4px 0 #e0a82d, 0 6px 12px var(--shadow);
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+/* 选项卡片网格 */
+.choice-grid {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 900px;
+}
+
+.letter-card {
+  width: 180px;
+  height: 200px;
+  border-radius: 28px;
+  border: none;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 8px 0 #e8dfd0, 0 12px 24px var(--shadow);
+  transition: transform 0.15s;
+  font-family: inherit;
+}
+
+.letter-card:active {
+  transform: translateY(4px) scale(0.97);
+  box-shadow: 0 4px 0 #e8dfd0, 0 6px 12px var(--shadow);
+}
+
+.letter-big {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 5.5rem;
+  font-weight: 800;
+  color: var(--coral);
+  line-height: 1;
+}
+
+.letter-big.lowercase {
+  color: var(--sky);
+}
+
+.letter-emoji {
+  font-size: 2.5rem;
+}
+
+/* 第2关：目标字母 + 9宫格 */
+.target-letter {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 7rem;
+  font-weight: 800;
+  color: var(--coral);
+  background: #fff;
+  border-radius: 32px;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 0 #e8dfd0, 0 12px 24px var(--shadow);
+  margin-bottom: 0.5rem;
+}
+
+.find-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 440px;
+}
+
+.find-cell {
+  width: 130px;
+  height: 130px;
+  border-radius: 24px;
+  border: none;
+  background: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 6px 0 #e8dfd0, 0 10px 18px var(--shadow);
+  transition: transform 0.15s;
+}
+
+.find-cell:active {
+  transform: translateY(3px) scale(0.96);
+  box-shadow: 0 3px 0 #e8dfd0, 0 5px 10px var(--shadow);
+}
+
+/* ============================================
+   庆祝屏
+   ============================================ */
+
+.celebrate-screen {
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, #fff9e6 0%, var(--cream) 70%);
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.confetti span {
+  position: absolute;
+  font-size: 3rem;
+  animation: confetti-fall 3s linear infinite;
+  opacity: 0.9;
+}
+
+.confetti span:nth-child(1) { left: 10%; animation-delay: 0s; }
+.confetti span:nth-child(2) { left: 22%; animation-delay: 0.3s; }
+.confetti span:nth-child(3) { left: 35%; animation-delay: 0.6s; }
+.confetti span:nth-child(4) { left: 50%; animation-delay: 0.2s; }
+.confetti span:nth-child(5) { left: 63%; animation-delay: 0.9s; }
+.confetti span:nth-child(6) { left: 75%; animation-delay: 0.5s; }
+.confetti span:nth-child(7) { left: 85%; animation-delay: 0.1s; }
+.confetti span:nth-child(8) { left: 92%; animation-delay: 0.7s; }
+
+@keyframes confetti-fall {
+  0%   { top: -10%; transform: rotate(0deg); }
+  100% { top: 110%; transform: rotate(720deg); }
+}
+
+.celebrate-content {
+  text-align: center;
+  z-index: 2;
+}
+
+.celebrate-mascot {
+  font-size: 8rem;
+  animation: pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-bottom: 0.5rem;
+}
+
+@keyframes pop-in {
+  0%   { transform: scale(0); }
+  70%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.celebrate-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--coral);
+  margin-bottom: 0.25rem;
+}
+
+.celebrate-sub {
+  font-size: 1.5rem;
+  color: var(--ink-soft);
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.big-stars {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.big-star {
+  font-size: 5rem;
+  color: #e5d5b8;
+  display: inline-block;
+  animation: star-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.big-star.on {
+  color: var(--sunny);
+  text-shadow: 0 4px 12px rgba(255, 201, 60, 0.5);
+}
+
+.big-star:nth-child(2) { animation-delay: 0.15s; }
+.big-star:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes star-bounce {
+  0%   { transform: scale(0) rotate(-180deg); opacity: 0; }
+  70%  { transform: scale(1.3) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* ============================================
+   移动端适配
+   ============================================ */
+
+@media (max-width: 768px) {
+  .welcome-title { font-size: 3.5rem; }
+  .welcome-mascot { font-size: 6rem; }
+
+  .map-title { font-size: 2rem; }
+  .level-card { width: 160px; padding: 1.5rem 1rem; }
+  .level-emoji { font-size: 3.5rem; }
+  .level-title { font-size: 1.5rem; }
+
+  .game-screen { padding: 5rem 1rem 1rem; }
+  .game-header { padding: 0 1rem 0 6rem; }
+
+  .instruction { font-size: 1.4rem; }
+  .sound-button { width: 110px; height: 110px; font-size: 3rem; }
+
+  .letter-card { width: 140px; height: 160px; }
+  .letter-big { font-size: 4.5rem; }
+  .letter-emoji { font-size: 2rem; }
+
+  .target-letter { font-size: 5rem; width: 120px; height: 120px; }
+  .find-cell { width: 100px; height: 100px; font-size: 3rem; }
+
+  .celebrate-title { font-size: 3rem; }
+  .celebrate-mascot { font-size: 6rem; }
+  .big-star { font-size: 4rem; }
+}

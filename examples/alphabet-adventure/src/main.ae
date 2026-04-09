@@ -1,0 +1,403 @@
+// Aether 字母冒险 — 为 2.5 岁幼儿设计的英文字母启蒙游戏
+import { $state, $derived, $effect, $store, mount } from 'aether'
+import { LETTERS, sample, shuffle } from './lib/letters.js'
+import { speak, playTap, playSuccess, playTryAgain, playFanfare } from './lib/audio.js'
+import { loadProgress, awardStar } from './lib/progress.js'
+
+// 全局游戏状态
+const game = $store({
+  screen: 'welcome',   // 'welcome' | 'map' | 'level1' | 'level2' | 'level3' | 'celebrate'
+  level1: loadProgress().level1,
+  level2: loadProgress().level2,
+  level3: loadProgress().level3,
+  lastWon: 0,          // 刚完成的关卡编号
+})
+
+// ============================================================
+// 欢迎屏：大标题 + 开始按钮
+// ============================================================
+function Welcome() {
+  return (
+    <div class="screen welcome-screen">
+      <div class="welcome-bg">
+        <div class="bubble bubble-1">A</div>
+        <div class="bubble bubble-2">B</div>
+        <div class="bubble bubble-3">C</div>
+        <div class="bubble bubble-4">D</div>
+        <div class="bubble bubble-5">E</div>
+      </div>
+      <div class="welcome-content">
+        <div class="welcome-mascot">🦁</div>
+        <h1 class="welcome-title">字母冒险</h1>
+        <p class="welcome-sub">Alphabet Adventure</p>
+        <button
+          class="big-button start-button"
+          onClick={() => {
+            playTap()
+            game.screen = 'map'
+          }}
+        >
+          开始 ▶
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// 关卡地图：3 个关卡节点，已解锁的可点击
+// ============================================================
+function LevelCard(props) {
+  const { num, title, emoji, stars, unlocked, onPlay } = props
+  return (
+    <div
+      class={unlocked ? 'level-card unlocked' : 'level-card locked'}
+      onClick={() => {
+        if (!unlocked) return
+        playTap()
+        onPlay()
+      }}
+    >
+      <div class="level-num">{num}</div>
+      <div class="level-emoji">{emoji}</div>
+      <div class="level-title">{title}</div>
+      <div class="level-stars">
+        <span class={stars >= 1 ? 'star on' : 'star'}>★</span>
+        <span class={stars >= 2 ? 'star on' : 'star'}>★</span>
+        <span class={stars >= 3 ? 'star on' : 'star'}>★</span>
+      </div>
+      {unlocked ? null : <div class="level-lock">🔒</div>}
+    </div>
+  )
+}
+
+function LevelMap() {
+  return (
+    <div class="screen map-screen">
+      <button
+        class="back-button"
+        onClick={() => { playTap(); game.screen = 'welcome' }}
+      >
+        ← 返回
+      </button>
+      <h2 class="map-title">选择关卡</h2>
+      <div class="level-grid">
+        <LevelCard
+          num="1"
+          title="听一听"
+          emoji="👂"
+          stars={game.level1}
+          unlocked={true}
+          onPlay={() => { game.screen = 'level1' }}
+        />
+        <LevelCard
+          num="2"
+          title="找一找"
+          emoji="🔍"
+          stars={game.level2}
+          unlocked={game.level1 >= 1}
+          onPlay={() => { game.screen = 'level2' }}
+        />
+        <LevelCard
+          num="3"
+          title="配一配"
+          emoji="🔗"
+          stars={game.level3}
+          unlocked={game.level2 >= 1}
+          onPlay={() => { game.screen = 'level3' }}
+        />
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// 第 1 关 — 听一听：播放字母发音，3 选 1
+// ============================================================
+function Level1() {
+  let round = $state(0)        // 当前第几题（0-4）
+  let correct = $state(0)      // 答对几题
+  let rounds = $state(buildLevel1Rounds())
+
+  function buildLevel1Rounds() {
+    // 生成 5 道题，每题 3 个选项
+    return Array.from({ length: 5 }, () => {
+      const choices = sample(LETTERS, 3)
+      const target = choices[Math.floor(Math.random() * 3)]
+      return { target, choices: shuffle(choices) }
+    })
+  }
+
+  let current = $derived(() => rounds[round])
+  let progress = $derived(() => `${round + 1} / 5`)
+
+  // 每进入新题目自动播报
+  $effect(() => {
+    const r = rounds[round]
+    if (r) {
+      setTimeout(() => speak(r.target.upper, { rate: 0.7, pitch: 1.3 }), 400)
+    }
+  })
+
+  function handleChoice(letter) {
+    playTap()
+    const target = rounds[round].target
+    if (letter.upper === target.upper) {
+      playSuccess()
+      speak(`${target.upper}, ${target.word}`, { rate: 0.75 })
+      correct = correct + 1
+      setTimeout(() => {
+        if (round >= 4) {
+          finishLevel(1, correct)
+        } else {
+          round = round + 1
+        }
+      }, 1400)
+    } else {
+      playTryAgain()
+    }
+  }
+
+  function replaySound() {
+    playTap()
+    speak(rounds[round].target.upper, { rate: 0.7, pitch: 1.3 })
+  }
+
+  return (
+    <div class="screen game-screen">
+      <div class="game-header">
+        <button class="back-button" onClick={() => { playTap(); game.screen = 'map' }}>←</button>
+        <div class="game-progress">{progress}</div>
+        <div class="game-score">⭐ {correct}</div>
+      </div>
+      <div class="game-body">
+        <p class="instruction">听一听，点正确的字母</p>
+        <button class="sound-button" onClick={replaySound}>🔊</button>
+        <div class="choice-grid">
+          {current.choices.map(letter => (
+            <button
+              class="letter-card"
+              onClick={() => handleChoice(letter)}
+            >
+              <div class="letter-big">{letter.upper}</div>
+              <div class="letter-emoji">{letter.emoji}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// 第 2 关 — 找一找：9 宫格里找目标字母
+// ============================================================
+function Level2() {
+  let round = $state(0)
+  let correct = $state(0)
+  let rounds = $state(buildLevel2Rounds())
+
+  function buildLevel2Rounds() {
+    return Array.from({ length: 5 }, () => {
+      const grid = sample(LETTERS, 9)
+      const target = grid[Math.floor(Math.random() * 9)]
+      return { target, grid: shuffle(grid) }
+    })
+  }
+
+  let current = $derived(() => rounds[round])
+  let progress = $derived(() => `${round + 1} / 5`)
+
+  $effect(() => {
+    const r = rounds[round]
+    if (r) {
+      setTimeout(() => speak(`Find ${r.target.upper}`, { rate: 0.75 }), 300)
+    }
+  })
+
+  function handlePick(letter) {
+    playTap()
+    const target = rounds[round].target
+    if (letter.upper === target.upper) {
+      playSuccess()
+      speak(target.upper, { rate: 0.8 })
+      correct = correct + 1
+      setTimeout(() => {
+        if (round >= 4) {
+          finishLevel(2, correct)
+        } else {
+          round = round + 1
+        }
+      }, 1200)
+    } else {
+      playTryAgain()
+    }
+  }
+
+  return (
+    <div class="screen game-screen">
+      <div class="game-header">
+        <button class="back-button" onClick={() => { playTap(); game.screen = 'map' }}>←</button>
+        <div class="game-progress">{progress}</div>
+        <div class="game-score">⭐ {correct}</div>
+      </div>
+      <div class="game-body">
+        <p class="instruction">找到这个字母</p>
+        <div class="target-letter">{current.target.upper}</div>
+        <div class="find-grid">
+          {current.grid.map(letter => (
+            <button
+              class="find-cell"
+              onClick={() => handlePick(letter)}
+            >
+              {letter.upper}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// 第 3 关 — 配一配：大写字母配小写字母
+// ============================================================
+function Level3() {
+  let round = $state(0)
+  let correct = $state(0)
+  let rounds = $state(buildLevel3Rounds())
+
+  function buildLevel3Rounds() {
+    return Array.from({ length: 5 }, () => {
+      const choices = sample(LETTERS, 3)
+      const target = choices[Math.floor(Math.random() * 3)]
+      return { target, choices: shuffle(choices) }
+    })
+  }
+
+  let current = $derived(() => rounds[round])
+  let progress = $derived(() => `${round + 1} / 5`)
+
+  $effect(() => {
+    const r = rounds[round]
+    if (r) {
+      setTimeout(() => speak(r.target.upper, { rate: 0.8 }), 300)
+    }
+  })
+
+  function handlePick(letter) {
+    playTap()
+    const target = rounds[round].target
+    if (letter.lower === target.lower) {
+      playSuccess()
+      speak(target.upper, { rate: 0.8 })
+      correct = correct + 1
+      setTimeout(() => {
+        if (round >= 4) {
+          finishLevel(3, correct)
+        } else {
+          round = round + 1
+        }
+      }, 1200)
+    } else {
+      playTryAgain()
+    }
+  }
+
+  return (
+    <div class="screen game-screen">
+      <div class="game-header">
+        <button class="back-button" onClick={() => { playTap(); game.screen = 'map' }}>←</button>
+        <div class="game-progress">{progress}</div>
+        <div class="game-score">⭐ {correct}</div>
+      </div>
+      <div class="game-body">
+        <p class="instruction">哪个是它的小写？</p>
+        <div class="target-letter">{current.target.upper}</div>
+        <div class="choice-grid">
+          {current.choices.map(letter => (
+            <button
+              class="letter-card"
+              onClick={() => handlePick(letter)}
+            >
+              <div class="letter-big lowercase">{letter.lower}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// 庆祝屏：通关动画 + 星星
+// ============================================================
+function Celebrate() {
+  const levelNum = game.lastWon
+  const stars = levelNum === 1 ? game.level1 : levelNum === 2 ? game.level2 : game.level3
+
+  $effect(() => {
+    playFanfare()
+    setTimeout(() => speak('Great job!', { rate: 0.9, pitch: 1.3 }), 500)
+  })
+
+  return (
+    <div class="screen celebrate-screen">
+      <div class="confetti">
+        <span>🎉</span><span>🎊</span><span>⭐</span><span>🌟</span>
+        <span>🎈</span><span>✨</span><span>🎉</span><span>🎊</span>
+      </div>
+      <div class="celebrate-content">
+        <div class="celebrate-mascot">🏆</div>
+        <h1 class="celebrate-title">太棒啦！</h1>
+        <p class="celebrate-sub">Great Job!</p>
+        <div class="big-stars">
+          <span class={stars >= 1 ? 'big-star on' : 'big-star'}>★</span>
+          <span class={stars >= 2 ? 'big-star on' : 'big-star'}>★</span>
+          <span class={stars >= 3 ? 'big-star on' : 'big-star'}>★</span>
+        </div>
+        <button
+          class="big-button"
+          onClick={() => { playTap(); game.screen = 'map' }}
+        >
+          继续 ▶
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// 通用工具
+// ============================================================
+function finishLevel(levelNum, correctCount) {
+  // 根据正确率计算星星：5/5 → 3 星，4/5 → 2 星，3/5 → 1 星
+  let stars = 1
+  if (correctCount >= 5) stars = 3
+  else if (correctCount >= 4) stars = 2
+
+  const p = awardStar(levelNum, stars)
+  game.level1 = p.level1
+  game.level2 = p.level2
+  game.level3 = p.level3
+  game.lastWon = levelNum
+  game.screen = 'celebrate'
+}
+
+// ============================================================
+// 根组件：根据 game.screen 切换屏幕
+// ============================================================
+function App() {
+  return (
+    <div class="app-root">
+      {game.screen === 'welcome' ? <Welcome /> : null}
+      {game.screen === 'map' ? <LevelMap /> : null}
+      {game.screen === 'level1' ? <Level1 /> : null}
+      {game.screen === 'level2' ? <Level2 /> : null}
+      {game.screen === 'level3' ? <Level3 /> : null}
+      {game.screen === 'celebrate' ? <Celebrate /> : null}
+    </div>
+  )
+}
+
+mount(App, '#app')
