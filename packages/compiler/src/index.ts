@@ -99,30 +99,33 @@ function aetherPlugin({ types: t }: { types: typeof BabelTypes }, options: Babel
           };
         },
         exit(path, state: PluginState) {
-          // .ae 隐式模式：自动注入运行时导入
+          // .ae 隐式模式：injectImplicitImports 已经完整处理了 import 重写
+          // （包括追加运行时导入 + 移除宏名导入），不能再调用 rewriteImports，
+          // 否则会重复注入 __signal / __store / __createElement 等标识符
           if (state.aether._implicitMode) {
             injectImplicitImports(path, state, t);
+          } else {
+            // 非隐式模式：.jsx/.tsx 文件走显式路径
+            // 如果有 JSX 但没有 aether import，注入 DOM 运行时导入
+            if (!state.aether.macroImported && state.aether._needsDOM) {
+              const domImports = [
+                '__createElement', '__createText', '__setAttr',
+                '__bindText', '__bindAttr', '__createComponent',
+                '__conditional', '__list', '__spreadAttrs',
+                '__child', '__bindChild'
+              ];
+              const specifiers = domImports.map(name =>
+                t.importSpecifier(t.identifier(name), t.identifier(name))
+              );
+              path.node.body.unshift(
+                t.importDeclaration(specifiers, t.stringLiteral('aether'))
+              );
+              return;
+            }
+            if (!state.aether.macroImported) return;
+            // 重写导入：将 'aether' 导入替换为运行时内部导入
+            rewriteImports(path, state, t);
           }
-
-          // 如果有 JSX 但没有 aether import，注入 DOM 运行时导入
-          if (!state.aether.macroImported && state.aether._needsDOM) {
-            const domImports = [
-              '__createElement', '__createText', '__setAttr',
-              '__bindText', '__bindAttr', '__createComponent',
-              '__conditional', '__list', '__spreadAttrs',
-              '__child', '__bindChild'
-            ];
-            const specifiers = domImports.map(name =>
-              t.importSpecifier(t.identifier(name), t.identifier(name))
-            );
-            path.node.body.unshift(
-              t.importDeclaration(specifiers, t.stringLiteral('aether'))
-            );
-            return;
-          }
-          if (!state.aether.macroImported) return;
-          // 重写导入：将 'aether' 导入替换为运行时内部导入
-          rewriteImports(path, state, t);
 
           // 执行 JSX 完整性验证
           const errors: Array<{ type: string; message: string; loc: unknown }> = [];
@@ -626,6 +629,20 @@ export function aetherVitePlugin(options: { ssr?: boolean } = {}) {
       }
     },
 
+    // Vite 默认不把 .ae 识别为 JS 模块，需要手动 load，
+    // 否则 dev server 会作为静态文件返回原始 JSX，不走 transform。
+    async load(id: string) {
+      if (!/\.ae(\?|$)/.test(id)) return null;
+      const cleanId = id.split('?')[0];
+      const fs = await import('node:fs/promises');
+      try {
+        const code = await fs.readFile(cleanId, 'utf-8');
+        return code;
+      } catch (err) {
+        return null;
+      }
+    },
+
     async transform(code: string, id: string) {
       // 支持 .ae (Aether 组件) + .jsx/.tsx/.js/.ts
       const isAetherFile = /\.ae(\?|$)/.test(id);
@@ -684,8 +701,28 @@ export function aetherVitePlugin(options: { ssr?: boolean } = {}) {
       }
     },
 
-    // Vite 专用钩子：处理 HMR
-    configureServer(server: { ws: { on: (event: string, cb: () => void) => void } }) {
+    // Vite 专用钩子：处理 HMR + .ae 请求拦截
+    // Vite 的 transformMiddleware 只处理 .js/.ts/.jsx/.tsx/.vue 等已知后缀，
+    // 需要把 .ae 请求改写到 transformRequest 走完整编译管线，否则会被当作
+    // 静态文件原样返回导致浏览器拿到未转换的 JSX 源码。
+    configureServer(server: any) {
+      server.middlewares.use(async (req: any, res: any, next: any) => {
+        const url: string = req.url || '';
+        if (!/\.ae(\?|$)/.test(url.split('?')[0])) return next();
+
+        try {
+          // 通过 Vite 的 transformRequest 触发完整的 plugin 管线
+          const result = await server.transformRequest(url);
+          if (!result) return next();
+
+          res.setHeader('Content-Type', 'application/javascript');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.end(result.code);
+        } catch (err) {
+          next(err);
+        }
+      });
+
       // 注入全局 HMR runtime
       server.ws.on('connection', () => {
         // 重置错误状态
