@@ -615,3 +615,448 @@ body {
   .celebrate-mascot { font-size: 6rem; }
   .big-star { font-size: 4rem; }
 }
+
+/* ============================================================
+   字母书（Book）
+   ============================================================ */
+.book-screen {
+  background: linear-gradient(180deg, #fff7e6 0%, #ffe9c9 100%);
+  overflow-y: auto;
+  padding-bottom: 2rem;
+}
+
+.book-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0.5rem;
+  gap: 0.75rem;
+}
+
+.book-title {
+  flex: 1;
+  text-align: center;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #6a3e0e;
+}
+
+.book-stars {
+  background: #ffd43b;
+  color: #5c3a00;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 0 #d4a900;
+  font-size: 1.1rem;
+}
+
+.book-hint {
+  text-align: center;
+  font-size: 1.05rem;
+  color: #8a5a1f;
+  margin: 0.25rem 0 1.25rem;
+  font-weight: 600;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.875rem;
+  padding: 0 1rem 1.5rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.book-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-family: inherit;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0.5rem;
+}
+
+.book-cell.unlocked {
+  background: #fff;
+  box-shadow: 0 6px 0 #ffb84d, 0 8px 16px rgba(255, 150, 50, 0.25);
+}
+
+.book-cell.unlocked:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #ffb84d, 0 4px 8px rgba(255, 150, 50, 0.25);
+}
+
+.book-cell.learned {
+  background: linear-gradient(135deg, #fff3a0 0%, #ffe066 100%);
+  box-shadow: 0 6px 0 #e6a500, 0 8px 16px rgba(255, 200, 0, 0.35);
+}
+
+.book-cell.locked {
+  background: #e8dcc4;
+  box-shadow: 0 4px 0 #c7b894;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.book-cell-upper {
+  font-family: 'Baloo 2', cursive;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #5c3a00;
+  line-height: 1;
+}
+
+.book-cell.locked .book-cell-upper {
+  color: #9a8866;
+}
+
+.book-cell-emoji {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.book-cell.locked .book-cell-emoji {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.book-cell-star {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 1.25rem;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+}
+
+.book-cell-lock {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* ============================================================
+   学习屏（Learn）
+   ============================================================ */
+.learn-screen {
+  background: linear-gradient(180deg, #e6f7ff 0%, #b3e5fc 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.learn-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  gap: 0.75rem;
+}
+
+.learn-progress {
+  flex: 1;
+  text-align: center;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1565a8;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+}
+
+.learn-stars {
+  background: #ffd43b;
+  color: #5c3a00;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 0 #d4a900;
+  font-size: 1.1rem;
+}
+
+.learn-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.learn-letter {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  border: none;
+  border-radius: 36px;
+  background: linear-gradient(135deg, #fff 0%, #fff8dc 100%);
+  box-shadow:
+    0 10px 0 #ffc93c,
+    0 14px 24px rgba(0, 0, 0, 0.15);
+  font-family: 'Baloo 2', cursive;
+  font-size: 11rem;
+  font-weight: 800;
+  color: #ff6f61;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0.85;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.learn-letter:active,
+.learn-letter.playing {
+  transform: translateY(6px) scale(0.97);
+  box-shadow:
+    0 4px 0 #ffc93c,
+    0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.learn-letter.playing {
+  animation: wiggle 0.6s ease;
+}
+
+.learn-lower {
+  position: absolute;
+  bottom: 20px;
+  right: 28px;
+  font-size: 3.5rem;
+  color: #6bb7f0;
+  font-weight: 700;
+}
+
+.learn-emoji {
+  width: 280px;
+  border: none;
+  border-radius: 36px;
+  background: #fff;
+  box-shadow:
+    0 10px 0 #74d3ae,
+    0 14px 24px rgba(0, 0, 0, 0.15);
+  padding: 1.75rem 1rem 1.25rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.learn-emoji:active,
+.learn-emoji.playing {
+  transform: translateY(6px) scale(0.97);
+  box-shadow:
+    0 4px 0 #74d3ae,
+    0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.learn-emoji.playing {
+  animation: bounce 0.6s ease;
+}
+
+.learn-emoji-big {
+  font-size: 6.5rem;
+  line-height: 1;
+}
+
+.learn-word {
+  font-family: 'Baloo 2', cursive;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #2e7d60;
+}
+
+.learn-footer {
+  padding: 1rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.learn-hint {
+  font-size: 1.05rem;
+  color: #1565a8;
+  font-weight: 600;
+  margin: 0;
+}
+
+.next-button {
+  background: linear-gradient(180deg, #74d3ae 0%, #2e9e7a 100%);
+  box-shadow: 0 8px 0 #1e6b52, 0 12px 24px rgba(46, 158, 122, 0.4);
+}
+
+/* ============================================================
+   小测验（Quiz）
+   ============================================================ */
+.quiz-screen {
+  background: linear-gradient(180deg, #ffe9f0 0%, #ffc2d4 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.quiz-header {
+  padding: 1.25rem;
+  display: flex;
+  justify-content: center;
+}
+
+.quiz-badge {
+  background: #ff6f8f;
+  color: #fff;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.35rem;
+  font-weight: 800;
+  padding: 0.5rem 1.5rem;
+  border-radius: 999px;
+  box-shadow: 0 5px 0 #cc4866;
+  letter-spacing: 0.04em;
+}
+
+.quiz-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0 1rem 1.5rem;
+}
+
+.quiz-choices {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.quiz-card {
+  width: 150px;
+  aspect-ratio: 1 / 1;
+  border: none;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 8px 0 #ff6f8f, 0 12px 20px rgba(255, 111, 143, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: inherit;
+}
+
+.quiz-card:active {
+  transform: translateY(4px) scale(0.97);
+  box-shadow: 0 4px 0 #ff6f8f, 0 6px 10px rgba(255, 111, 143, 0.3);
+}
+
+.quiz-card.glow {
+  animation: glow-pulse 1s ease-in-out infinite;
+}
+
+.quiz-letter {
+  font-family: 'Baloo 2', cursive;
+  font-size: 4.5rem;
+  font-weight: 800;
+  color: #ff3d68;
+  line-height: 0.9;
+}
+
+.quiz-emoji {
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 8px 0 #ff6f8f, 0 0 0 0 rgba(255, 201, 60, 0.6);
+  }
+  50% {
+    box-shadow: 0 8px 0 #ff6f8f, 0 0 0 16px rgba(255, 201, 60, 0);
+  }
+}
+
+/* ============================================================
+   庆祝屏额外样式（新版统计卡片）
+   ============================================================ */
+.celebrate-stats {
+  display: flex;
+  gap: 1.25rem;
+  margin: 1.25rem 0;
+}
+
+.celebrate-stat {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 1rem 1.5rem;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 6px 0 rgba(255, 201, 60, 0.6);
+}
+
+.celebrate-stat-num {
+  font-family: 'Baloo 2', cursive;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #ff6f61;
+  line-height: 1;
+}
+
+.celebrate-stat-label {
+  font-size: 0.95rem;
+  color: #6a3e0e;
+  font-weight: 600;
+  margin-top: 0.35rem;
+}
+
+/* ============================================================
+   Learn 屏手机端适配
+   ============================================================ */
+@media (max-width: 640px) {
+  .book-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .book-cell-upper { font-size: 2rem; }
+  .book-cell-emoji { font-size: 1.2rem; }
+
+  .learn-letter {
+    width: 200px;
+    height: 200px;
+    font-size: 9rem;
+    border-radius: 28px;
+  }
+  .learn-lower {
+    font-size: 2.8rem;
+    bottom: 16px;
+    right: 22px;
+  }
+
+  .learn-emoji {
+    width: 220px;
+    padding: 1.25rem 0.75rem 1rem;
+  }
+  .learn-emoji-big { font-size: 5rem; }
+  .learn-word { font-size: 1.65rem; }
+
+  .quiz-card {
+    width: 130px;
+  }
+  .quiz-letter { font-size: 3.75rem; }
+  .quiz-emoji { font-size: 1.9rem; }
+}
